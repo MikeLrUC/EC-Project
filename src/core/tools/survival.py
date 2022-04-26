@@ -2,7 +2,6 @@ from .population import Population
 
 class Survival:
 
-    @staticmethod
     def elitism(elitism_size):
         def survive(parents: Population, offspring: Population):
             parents.sort(reverse=True)

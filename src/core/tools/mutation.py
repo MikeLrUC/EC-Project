@@ -4,7 +4,6 @@ from .individual import Individual
 
 class Mutation:
 
-    @staticmethod
     def dummy(probability):
         def mutate(individual: Individual):
             if rd.random() <= probability:

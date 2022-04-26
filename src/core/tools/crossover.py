@@ -4,7 +4,6 @@ from .individual import Individual
 
 class Crossover:
 
-    @staticmethod
     def dummy(probability):
         def crossover(p1: Individual, p2: Individual):
             if rd.random() <= probability:

@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 
 class Plotter:
 
-    @staticmethod
     def simple_fitness(runs: pd.DataFrame):
         generations = runs["Generation"].unique()
         data_by_gen = runs[["Generation", "Fitness"]].groupby("Generation")
@@ -58,8 +57,6 @@ class Plotter:
         plt.legend()
         plt.show()
 
-
-    @staticmethod
     def box_plot(generation, runs: list, labels=["Algorithm 0", "Algorithm 1"]):
         n_algorithms = len(runs)
 
