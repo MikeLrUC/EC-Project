@@ -6,4 +6,5 @@ from .mutation import Mutation
 from .survival import Survival
 from .crossover import Crossover
 from .selection import Selection
+from .fitness import Fitness
 
