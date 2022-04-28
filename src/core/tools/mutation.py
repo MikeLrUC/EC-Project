@@ -31,16 +31,16 @@ class Mutation:
         return mutate
     
     # per gene mutation Self-Adaptation in Evolutionary Strategies
-    def mutate_SA(probability):
+    def mutate_SA(probability, learning_rate):
         '''
         probability: probability value to be used in the per gene mutation.
+        learning_rate: coeficient used to control the change in the current standard deviation.
         returns a function that will perform the mutation.
         '''
-        def mutate(individual: Individual_SA, domain, learning_rate):
+        def mutate(individual: Individual_SA, domain):
             '''
             individual: the individual that we want to mutate.
             domain: list with the intervals where each gene should belong to.
-            learning_rate: coeficient used to control the change in the current standard deviation.
             '''
             # mutate genes
             new_genes = [min(max(Generator.new_gene_SA(individual.chromosome[i], individual.chromosome[i + individual.genes_size]), domain[i][0]), domain[i][1]) for i in range(individual.genes_size)]

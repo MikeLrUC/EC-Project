@@ -35,8 +35,10 @@ if __name__ == "__main__":
     N_RUNS = 10
     
     domain = [[-5.12, 5.12]] * SIZE_CHROMOSOME # domain for the sphere function
+    learning_rate = 0.1
+
     filename="ga_run_"
-    # filename="teste"
+    ilename="teste"
     
     data = {
         "population" : Generator.random_binary_population(SIZE_CHROMOSOME, N_POPULATION),
@@ -58,11 +60,22 @@ if __name__ == "__main__":
         "domain"     : domain # domain for each gene of the individual
     }
 
+    SA_ga_example_data = {
+        "population" : Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, domain, Individual_SA), # create the population for the (default) normal ga
+        "crossover"  : Crossover.n_point_crossover(2), # 2 point crossover
+        "mutation"   : Mutation.mutate_SA(0.5, learning_rate), # mutation for the SA ga
+        "selection"  : Selection.tournament(3),
+        "survival"   : Survival.elitism(1),
+        "fitness"    : Fitness.sphere, # sphere as the target function 
+        "domain"     : domain # domain for each gene of the individual
+    }
+
     # Running
     runs = []
     for i in range(N_RUNS):
-        ga = GeneticAlgorithm(**data)
-        # ga = GeneticAlgorithm(**normal_ga_example_data)
+        # ga = GeneticAlgorithm(**data)
+        ga = GeneticAlgorithm(**normal_ga_example_data)
+        # ga = GeneticAlgorithm(**SA_ga_example_data)
         ga.run(N_GENERATIONS)
         runs.append(ga.generations)
     

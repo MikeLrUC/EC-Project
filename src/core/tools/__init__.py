@@ -1,4 +1,4 @@
-from .individual import Individual
+from .individual import *
 from .population import Population
 from .generator import Generator
 
