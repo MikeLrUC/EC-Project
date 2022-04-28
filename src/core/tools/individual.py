@@ -6,7 +6,8 @@ class Individual:
         self.genes_size = len(chromosome)
 
     def __str__(self):
-        return f"{self.fitness} | {str(self.chromosome)}"
+        # return f"{self.fitness} | {str(self.chromosome)}"
+        return f"fit:{self.fitness}\ngenes.{str(self.chromosome)}"
 
     def mutate(self, mutation_function):
         mutation_function(self)
@@ -25,3 +26,6 @@ class Individual_SA(Individual):
         self.chromosome = chromosome + stds # by combining the two, we can use the same crossover function for both algorithms
         self.fitness = fitness
         self.genes_size = len(chromosome)
+    
+    def __str__(self):
+        return f"fit:{self.fitness}\ngenes:{str(self.chromosome[: self.genes_size])}\nstds:{str(self.chromosome[self.genes_size :])}"

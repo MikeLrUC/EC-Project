@@ -3,10 +3,14 @@ import matplotlib.pyplot as plt
 
 class Plotter:
 
-    def simple_fitness(runs: pd.DataFrame):
+    def simple_fitness(runs: pd.DataFrame, maximize = 1):
         generations = runs["Generation"].unique()
         data_by_gen = runs[["Generation", "Fitness"]].groupby("Generation")
-        maximum = data_by_gen.max()
+        if maximize:
+            best_results = data_by_gen.max()
+        else:
+            best_results = data_by_gen.min()
+        # maximum = data_by_gen.max()
         mean = data_by_gen.mean()
         plt.figure()
         
@@ -14,7 +18,7 @@ class Plotter:
         plt.plot(generations, mean, color="r", label="Average")
         
         # Max Fitness by Generations (All runs)
-        plt.plot(generations, maximum, color="g", label="Best")
+        plt.plot(generations, best_results, color="g", label="Best")
         
         # Text
         plt.title(f"Fitness Over Generations ({1 + runs['Run'].max()} runs)")
@@ -57,18 +61,25 @@ class Plotter:
         plt.legend()
         plt.show()
 
-    def box_plot(generation, runs: list, labels=["Algorithm 0", "Algorithm 1"]):
+    def box_plot(generation, runs: list, labels=["Algorithm 0", "Algorithm 1"], maximize = 1):
         n_algorithms = len(runs)
 
-        data, means, maxs = [], [], []
+        # data, means, maxs = [], [], []
+        data, means, best_results = [], [], []
         for i, run in enumerate(runs):
             data.append(run[run["Generation"] == generation][["Run", "Fitness"]].groupby("Run"))
             means.append(data[i].mean())
-            maxs.append(data[i].max())
+            if maximize:
+                best_results.append(data[i].max())
+            else:
+                best_results.append(data[i].min())
 
         # Fitness Comparison of given Generation
-        comparisons = [means, maxs]
-        titles = ["Mean", "Maximum"]
+        comparisons = [means, best_results]
+        if maximize:
+            titles = ["Mean", "Maximum"]
+        else:
+            titles = ["Mean", "Minimum"]
         colors = ["red", "green"]
         for i, comparison in enumerate(comparisons):
             plt.subplots(1, n_algorithms)

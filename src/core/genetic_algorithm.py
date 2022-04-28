@@ -83,6 +83,6 @@ if __name__ == "__main__":
     df = Logger.save_csv(f"{filename}{N_GENERATIONS}", runs)
     
     # Plotting
-    Plotter.simple_fitness(df)
+    Plotter.simple_fitness(df, maximize = 0) # estamos a minimizar
     Plotter.fancy_fitness(df)
-    Plotter.box_plot(N_GENERATIONS, [df, df], labels=["First Algorithm", "Second Algorithm"])
+    Plotter.box_plot(N_GENERATIONS, [df, df], labels=["First Algorithm", "Second Algorithm"], maximize = 0)
