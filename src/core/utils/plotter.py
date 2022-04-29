@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 class Plotter:
 
-    def simple_fitness(runs: pd.DataFrame, maximize=False, show=True):
+    def simple_fitness(runs: pd.DataFrame, algorithm, maximize=False, show=True):
         generations = runs["Generation"].unique()
         data_by_gen = runs[["Generation", "Fitness"]].groupby("Generation")
 
@@ -20,13 +20,14 @@ class Plotter:
         plt.plot(generations, best_results, color="g", label="Best")
         
         # Text
-        plt.title(f"Fitness Over Generations ({1 + runs['Run'].max()} runs)")
+        plt.title(f"[{algorithm}]Fitness Over Generations ({1 + runs['Run'].max()} runs)")
         plt.xlabel("Generation")
         plt.ylabel("Fitness")
         plt.legend()
         plt.show(block=show)
+        return fig
 
-    def fancy_fitness(runs: pd.DataFrame, show=True):
+    def fancy_fitness(runs: pd.DataFrame, algorithm, show=True):
         generations = runs["Generation"].unique()
         data_by_gen = runs[["Generation", "Fitness"]].groupby("Generation")
 
@@ -56,7 +57,7 @@ class Plotter:
         plt.plot(generations, maximum, color="green", label="Maximum")
         
         # Text
-        plt.title(f"Fitness Over Generations ({1 + runs['Run'].max()} runs)")
+        plt.title(f"[{algorithm}]Fitness Over Generations ({1 + runs['Run'].max()} runs)")
         plt.xlabel("Generation")
         plt.ylabel("Fitness")
         plt.legend()

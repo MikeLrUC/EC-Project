@@ -13,8 +13,11 @@ class GeneticAlgorithm:
         self.population.evaluate(self.fitness_func)
         self.generations = [deepcopy(self.population)]
         self.domain = domain # list with the following structure [[min_gene_1, max_gene_1], [min_gene_2, max_gene_2], ..., [min_gene_n, max_gene_n]]
+        self.best = None
+        self.best_generation = None
 
     def run(self, generations):
+        # TODO: acrescentar variaveis para guardar a geracao onde foi encontrado o best por cada run. Depois precisamos desta informacao guardada num ficheiro para podermos analisar mais tarde com os testes estatísticos.
         for i in range(generations):
             print(f"Generation: {i + 1} of {generations}")                              # Logging Info
 
@@ -22,17 +25,24 @@ class GeneticAlgorithm:
             offspring = parents.breed(self.crossover_op, self.mutation_op, self.domain) # Breed (Crossover + Mutation)
             offspring.evaluate(self.fitness_func)                                       # Evaluate Offspring
             self.population = self.population.survive(self.survival_op, offspring)      # Select Survivors
-            print(f'best: {self.population.best()}')
+            curr_gen_best = self.population.best()
+            # print(f'best: {self.population.best()}')
+            print(f'best: {curr_gen_best}')
             self.generations.append(deepcopy(self.population))                          # Logging Info
 
-        print(self.population.best())                                                   # Logging Info
+            # update best stats
+            if self.best is None or self.best.fitness > curr_gen_best.fitness: # if better, update
+                self.best = curr_gen_best
+                self.best_generation = i
+
+        print(self.best)                                                   # Logging Info
 
 if __name__ == "__main__":
     # Parameters
     N_POPULATION = 20
     SIZE_CHROMOSOME = 10
     N_GENERATIONS = 500
-    N_RUNS = 10
+    N_RUNS = 1
     LEARNING_RATE = 0.1
     DOMAIN = [[-5.12, 5.12]] * SIZE_CHROMOSOME  # domain for the sphere function
 
@@ -61,7 +71,8 @@ if __name__ == "__main__":
     # Running
     results = []
     figures = []
-    for filename in filenames:
+    labels = ["Default Algorithm", "SA Algorithm"]
+    for e, filename in enumerate(filenames):
         runs = []
         for i in range(N_RUNS):
             ga = GeneticAlgorithm(**default_ga_example_data)
@@ -74,8 +85,9 @@ if __name__ == "__main__":
         results.append(df)
     
         # Plotting
-        figures.append(Plotter.simple_fitness(df, maximize=False))
-        figures.append(Plotter.fancy_fitness(df))
+        figures.append(Plotter.simple_fitness(df, labels[e], maximize=False))
+        figures.append(Plotter.fancy_fitness(df, labels[e]))
 
-    figures += Plotter.box_plot(N_GENERATIONS, [results[0], results[1]], labels=["Default Algorithm", "SA Algorithm"], maximize=False)
+    figures += Plotter.box_plot(N_GENERATIONS, [results[0], results[1]], labels=labels, maximize=False)
+    print(f'figures: {figures}')
     Logger.save_figures(figures, "Last_run")
