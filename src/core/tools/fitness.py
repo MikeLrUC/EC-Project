@@ -4,7 +4,7 @@ from .individual import *
 
 
 class Fitness:
-
+    # TODO: Miguel Review
     def sphere(chromosome, genes_size):
         '''
         chromosome: list with the genes or genes + stds.

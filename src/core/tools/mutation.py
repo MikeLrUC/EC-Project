@@ -1,21 +1,12 @@
-from operator import le
 import random as rd
-import numpy as np
 
 from .individual import Individual, Individual_SA
 from .generator import Generator
 
 class Mutation:
-
-    def dummy(probability):
-        def mutate(individual: Individual, domain = None):
-            if rd.random() <= probability:
-                individual.chromosome[int(rd.random() * len(individual.chromosome))] = rd.random()
-            return individual
-        return mutate
     
-    # per gene mutation
-    def mutate_default(probability):
+    # Per gene mutation
+    def default(probability):
         '''
         probability: probability value to be used in the per gene mutation.
         returns a function that will perform the mutation.
@@ -30,8 +21,8 @@ class Mutation:
             return individual
         return mutate
     
-    # per gene mutation Self-Adaptation in Evolutionary Strategies
-    def mutate_SA(probability, learning_rate):
+    # Per gene mutation Self-Adaptation in Evolutionary Strategies
+    def SA(probability, learning_rate):
         '''
         probability: probability value to be used in the per gene mutation.
         learning_rate: coeficient used to control the change in the current standard deviation.
@@ -42,13 +33,13 @@ class Mutation:
             individual: the individual that we want to mutate.
             domain: list with the intervals where each gene should belong to.
             '''
-            # mutate genes
+            # Mutate genes
             new_genes = [min(max(Generator.new_gene_SA(individual.chromosome[i], individual.chromosome[i + individual.genes_size]), domain[i][0]), domain[i][1]) for i in range(individual.genes_size)]
 
-            # mutate stds
+            # Mutate stds
             new_stds = [Generator.new_std_SA(individual.chromosome[i + individual.genes_size], learning_rate) for i in range(individual.genes_size)]
 
-            # build chromosome
+            # Build Chromosome
             individual.chromosome = new_genes + new_stds
 
             return individual
@@ -59,14 +50,14 @@ if __name__ == '__main__':
     domain = [[0, 1]] * size
     
     # default ga
-    m = Mutation.mutate_default(0.5)
+    m = Mutation.default(0.5)
     p1 = Individual([1] * size, None)
     new_p1 = m(p1, domain)
     print(f'p1: {new_p1}\n')
 
     # ga with SA
-    m_sa = Mutation.mutate_SA(0.5)
     learning_rate = 0.1
+    m_sa = Mutation.SA(0.5, learning_rate)
     p2 = Individual_SA([1] * size, None)
     new_p2 = m_sa(p2, domain, learning_rate)
     print(f'p2: {new_p2}\n')

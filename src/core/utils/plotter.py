@@ -3,21 +3,20 @@ import matplotlib.pyplot as plt
 
 class Plotter:
 
-    def simple_fitness(runs: pd.DataFrame, maximize = 1):
+    def simple_fitness(runs: pd.DataFrame, maximize=False, show=True):
         generations = runs["Generation"].unique()
         data_by_gen = runs[["Generation", "Fitness"]].groupby("Generation")
-        if maximize:
-            best_results = data_by_gen.max()
-        else:
-            best_results = data_by_gen.min()
-        # maximum = data_by_gen.max()
+
+        best_results = data_by_gen.max() if maximize else data_by_gen.min()
         mean = data_by_gen.mean()
-        plt.figure()
+
+        # Plotting
+        fig = plt.figure()
         
         # Average Fitness by Generations (All runs)
         plt.plot(generations, mean, color="r", label="Average")
         
-        # Max Fitness by Generations (All runs)
+        # Best Fitness by Generations (All runs)
         plt.plot(generations, best_results, color="g", label="Best")
         
         # Text
@@ -25,18 +24,20 @@ class Plotter:
         plt.xlabel("Generation")
         plt.ylabel("Fitness")
         plt.legend()
-        plt.show()
+        plt.show(block=show)
 
-    def fancy_fitness(runs: pd.DataFrame):
+    def fancy_fitness(runs: pd.DataFrame, show=True):
         generations = runs["Generation"].unique()
         data_by_gen = runs[["Generation", "Fitness"]].groupby("Generation")
+
         maximum = data_by_gen.max()
         minimum = data_by_gen.min()
         median = data_by_gen.median()
         mean = data_by_gen.mean()
         std = data_by_gen.std()
         
-        plt.figure()
+        # Plotting
+        fig = plt.figure()
 
         # Fitness Median by Generations (All runs)
         plt.plot(generations, median, color="blue", label="Median")
@@ -59,36 +60,35 @@ class Plotter:
         plt.xlabel("Generation")
         plt.ylabel("Fitness")
         plt.legend()
-        plt.show()
+        plt.show(block=show)
+        return fig
 
-    def box_plot(generation, runs: list, labels=["Algorithm 0", "Algorithm 1"], maximize = 1):
+    def box_plot(generation, runs: list, labels=["Algorithm 0", "Algorithm 1"], maximize=False, show=True):
         n_algorithms = len(runs)
 
-        # data, means, maxs = [], [], []
         data, means, best_results = [], [], []
         for i, run in enumerate(runs):
             data.append(run[run["Generation"] == generation][["Run", "Fitness"]].groupby("Run"))
             means.append(data[i].mean())
-            if maximize:
-                best_results.append(data[i].max())
-            else:
-                best_results.append(data[i].min())
+            best_results += [data[i].max() if maximize else data[i].min()]
 
         # Fitness Comparison of given Generation
         comparisons = [means, best_results]
-        if maximize:
-            titles = ["Mean", "Maximum"]
-        else:
-            titles = ["Mean", "Minimum"]
+
+        titles = ["Mean", "Maximum"] if maximize else ["Mean", "Minimum"]
         colors = ["red", "green"]
+
+        figures = []
         for i, comparison in enumerate(comparisons):
-            plt.subplots(1, n_algorithms)
+            fig, _ = plt.subplots(1, n_algorithms)
+            figures.append(fig)
             plt.suptitle(f"Generation {generation} Fitness {titles[i]} by {1 + runs[0]['Run'].max()} Runs")
             for j in range(n_algorithms):
                 plt.subplot(1, n_algorithms, j+1)
                 plt.scatter([1] * len(comparison[j]), comparison[j], color=colors[i])
                 plt.boxplot(comparison[j], labels=[labels[j]])
-        plt.show()
+        plt.show(block=show)
+        return figures
 
 
 

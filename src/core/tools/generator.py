@@ -2,13 +2,9 @@ import random as rd
 import numpy as np
 
 from .population import Population
-from .individual import Individual
 
 class Generator:
 
-    def random_binary_population(chromosome_size, population_size):
-        return Population([Individual([rd.randint(0, 1) for j in range(chromosome_size)], None) for i in range(population_size)])
-    
     def random_float_generation(chromosome_size, population_size, domain, Individual_constructor):
         '''
         chromosome_size: size of the genotype of the individual.
@@ -24,6 +20,7 @@ class Generator:
         '''
         return (interval[1] - interval[0]) * rd.random() + interval[0]
     
+    #TODO: Miguel review this
     def new_gene_SA(old_gene, std):
         '''
         old_gene: the value that the current gene has.

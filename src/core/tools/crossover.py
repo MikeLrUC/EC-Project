@@ -4,14 +4,7 @@ from .individual import Individual
 
 class Crossover:
 
-    def dummy(probability):
-        def crossover(p1: Individual, p2: Individual):
-            if rd.random() <= probability:
-                p1, p2 = p2, p1
-            return p1, p2
-        return crossover
-
-    # one point crossover
+    # N point crossover
     def n_point_crossover(n):
         '''
         n: number of points in the n point crossover.

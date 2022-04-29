@@ -33,56 +33,49 @@ if __name__ == "__main__":
     SIZE_CHROMOSOME = 10
     N_GENERATIONS = 500
     N_RUNS = 10
-    
-    domain = [[-5.12, 5.12]] * SIZE_CHROMOSOME # domain for the sphere function
-    learning_rate = 0.1
+    LEARNING_RATE = 0.1
+    DOMAIN = [[-5.12, 5.12]] * SIZE_CHROMOSOME  # domain for the sphere function
 
-    filename="ga_run_"
-    ilename="teste"
-    
-    data = {
-        "population" : Generator.random_binary_population(SIZE_CHROMOSOME, N_POPULATION),
-        "crossover"  : Crossover.dummy(0),
-        "mutation"   : Mutation.dummy(0.05),
-        "selection"  : Selection.tournament(2),
-        "survival"   : Survival.elitism(1),
-        "fitness"    : lambda x, genes_size : sum(x),
-        "domain"     : []
-    }
+    filenames = ["default_", "sa_"]
 
-    normal_ga_example_data = {
-        "population" : Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, domain, Individual), # create the population for the (default) normal ga
-        "crossover"  : Crossover.n_point_crossover(2), # 2 point crossover
-        "mutation"   : Mutation.mutate_default(0.5), # mutation for the nornal ga
+    default_ga_example_data = {
+        "population" : Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, DOMAIN, Individual), 
+        "crossover"  : Crossover.n_point_crossover(2),
+        "mutation"   : Mutation.default(0.5),           # Mutation for the Default GA
         "selection"  : Selection.tournament(3),
         "survival"   : Survival.elitism(1),
-        "fitness"    : Fitness.sphere, # sphere as the target function 
-        "domain"     : domain # domain for each gene of the individual
+        "fitness"    : Fitness.sphere,                  # Sphere as the target function 
+        "domain"     : DOMAIN                           # domain for each gene of the individual
     }
 
     SA_ga_example_data = {
-        "population" : Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, domain, Individual_SA), # create the population for the (default) normal ga
-        "crossover"  : Crossover.n_point_crossover(2), # 2 point crossover
-        "mutation"   : Mutation.mutate_SA(0.5, learning_rate), # mutation for the SA ga
+        "population" : Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, DOMAIN, Individual_SA), 
+        "crossover"  : Crossover.n_point_crossover(2),
+        "mutation"   : Mutation.SA(0.5, LEARNING_RATE),  # Mutation for the SA GA
         "selection"  : Selection.tournament(3),
         "survival"   : Survival.elitism(1),
-        "fitness"    : Fitness.sphere, # sphere as the target function 
-        "domain"     : domain # domain for each gene of the individual
+        "fitness"    : Fitness.sphere,                   # Sphere as the target function 
+        "domain"     : DOMAIN                            # Domain for each gene of the individual
     }
 
     # Running
-    runs = []
-    for i in range(N_RUNS):
-        # ga = GeneticAlgorithm(**data)
-        ga = GeneticAlgorithm(**normal_ga_example_data)
-        # ga = GeneticAlgorithm(**SA_ga_example_data)
-        ga.run(N_GENERATIONS)
-        runs.append(ga.generations)
+    results = []
+    figures = []
+    for filename in filenames:
+        runs = []
+        for i in range(N_RUNS):
+            ga = GeneticAlgorithm(**default_ga_example_data)
+            # ga = GeneticAlgorithm(**SA_ga_example_data)
+            ga.run(N_GENERATIONS)
+            runs.append(ga.generations)
     
-    # Logging    
-    df = Logger.save_csv(f"{filename}{N_GENERATIONS}", runs)
+        # Logging    
+        df = Logger.save_csv(f"{filename}{N_GENERATIONS}", runs)
+        results.append(df)
     
-    # Plotting
-    Plotter.simple_fitness(df, maximize = 0) # estamos a minimizar
-    Plotter.fancy_fitness(df)
-    Plotter.box_plot(N_GENERATIONS, [df, df], labels=["First Algorithm", "Second Algorithm"], maximize = 0)
+        # Plotting
+        figures.append(Plotter.simple_fitness(df, maximize=False))
+        figures.append(Plotter.fancy_fitness(df))
+
+    figures += Plotter.box_plot(N_GENERATIONS, [results[0], results[1]], labels=["Default Algorithm", "SA Algorithm"], maximize=False)
+    Logger.save_figures(figures, "Last_run")

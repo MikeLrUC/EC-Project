@@ -6,8 +6,7 @@ class Individual:
         self.genes_size = len(chromosome)
 
     def __str__(self):
-        # return f"{self.fitness} | {str(self.chromosome)}"
-        return f"fit:{self.fitness}\ngenes.{str(self.chromosome)}"
+        return f"Fit: {self.fitness}\nGenes: {str(self.chromosome)}"
 
     def mutate(self, mutation_function):
         mutation_function(self)
@@ -28,4 +27,4 @@ class Individual_SA(Individual):
         self.genes_size = len(chromosome)
     
     def __str__(self):
-        return f"fit:{self.fitness}\ngenes:{str(self.chromosome[: self.genes_size])}\nstds:{str(self.chromosome[self.genes_size :])}"
+        return f"Fit: {self.fitness}\nGenes: {str(self.chromosome[: self.genes_size])}\nStds:{str(self.chromosome[self.genes_size :])}"
