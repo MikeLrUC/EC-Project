@@ -31,11 +31,11 @@ class GeneticAlgorithm:
             self.generations.append(deepcopy(self.population))                          # Logging Info
 
             # update best stats
-            if self.best is None or self.best.fitness > curr_gen_best.fitness: # if better, update
+            if self.best is None or self.best.fitness > curr_gen_best.fitness:          # if better, update
                 self.best = curr_gen_best
                 self.best_generation = i
 
-        print(self.best)                                                   # Logging Info
+        print(self.best)                                                                # Logging Info
 
 if __name__ == "__main__":
     # Parameters
@@ -72,16 +72,16 @@ if __name__ == "__main__":
     results = []
     figures = []
     labels = ["Default Algorithm", "SA Algorithm"]
+    algorithms = ["GeneticAlgorithm(**default_ga_example_data)", "GeneticAlgorithm(**SA_ga_example_data)"]
     for e, filename in enumerate(filenames):
         runs = []
         for i in range(N_RUNS):
-            ga = GeneticAlgorithm(**default_ga_example_data)
-            # ga = GeneticAlgorithm(**SA_ga_example_data)
+            ga: GeneticAlgorithm = eval(algorithms[e])
             ga.run(N_GENERATIONS)
             runs.append(ga.generations)
     
         # Logging    
-        df = Logger.save_csv(f"{filename}{N_GENERATIONS}", runs)
+        df = Logger.save_csv(runs, f"{filename}{N_GENERATIONS}")
         results.append(df)
     
         # Plotting

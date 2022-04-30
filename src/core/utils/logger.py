@@ -1,14 +1,15 @@
 import pandas as pd
 
 from matplotlib.backends.backend_pdf import PdfPages
+from tabulate import tabulate
+
 class Logger:
     DIR = __file__.split("core")[0] + "data/"
     LOG = DIR + "log/"
     OTHERS = DIR + "others/"
 
     @classmethod
-    def save_csv(cls, filename, runs: list):
-        d = dict()
+    def save_csv(cls, runs: list, filename):
         with open(cls.LOG + filename + ".csv", "w") as f:
             f.write("Run,Generation,Individual,Fitness\n")
             for r, run in enumerate(runs):
@@ -23,4 +24,11 @@ class Logger:
         with PdfPages(cls.OTHERS + filename + ".pdf") as pdf:
             for i in range(0, len(figures)):
                 pdf.savefig(figures[i])
-        
+    
+    @classmethod
+    def assumptions(cls, data, filename):
+        return
+
+    @classmethod
+    def anova(cls, anova_results: dict, filename):
+        return

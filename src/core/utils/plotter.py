@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+import scipy.stats as st
 import matplotlib.pyplot as plt
 
 class Plotter:
@@ -20,7 +22,7 @@ class Plotter:
         plt.plot(generations, best_results, color="g", label="Best")
         
         # Text
-        plt.title(f"[{algorithm}]Fitness Over Generations ({1 + runs['Run'].max()} runs)")
+        plt.title(f"[{algorithm}] Fitness Over Generations ({1 + runs['Run'].max()} runs)")
         plt.xlabel("Generation")
         plt.ylabel("Fitness")
         plt.legend()
@@ -57,7 +59,7 @@ class Plotter:
         plt.plot(generations, maximum, color="green", label="Maximum")
         
         # Text
-        plt.title(f"[{algorithm}]Fitness Over Generations ({1 + runs['Run'].max()} runs)")
+        plt.title(f"[{algorithm}] Fitness Over Generations ({1 + runs['Run'].max()} runs)")
         plt.xlabel("Generation")
         plt.ylabel("Fitness")
         plt.legend()
@@ -90,6 +92,22 @@ class Plotter:
                 plt.boxplot(comparison[j], labels=[labels[j]])
         plt.show(block=show)
         return figures
+
+    def histogram(data: list, title, bins=25, normal=False, show=True):
+        
+        fig = plt.figure()
+        plt.hist(data, bins=bins)
+
+        if normal:
+            mu, std = st.norm.fit(data)
+            x = np.linspace(*plt.xlim(), 1000)
+            plt.plot(x, st.norm.pdf(x, mu, std))
+        
+        plt.title(title)
+        plt.xlabel("Values")
+        plt.ylabel("Frequency")
+        plt.show(block=show)
+        return fig 
 
 
 
