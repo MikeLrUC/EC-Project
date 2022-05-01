@@ -24,28 +24,28 @@ class Statistics:
     |              ║                                       ╠══ Q3           (75%)
     |              ║                                       ╚══ Maximum      (100%)
     |              ║
-    |              ╚══ Inference ══╦══ Normality ══╦══ Kolmogorov-Smirnov test
-    |                              ║               ╠══ Shapiro-Wilk test
-    |                              ║               ╚══ Anderson-Darling test
-    |                              ║               
-    |                              ╠══ Variance Homogeneity ═════ Levene Test
-    |                              ║               
-    |                              ╠══ Effect Size ══╦══ Parametric ═════ T test Effect Size 
-    |                              ║                 ║
-    |                              ║                 ╚══ Non Parametric ══╦══ Mann Whitney Effect Size 
-    |                              ║                                      ╚══ Wilcoxon Effect Size
-    |                              ║               
-    |                              ╚══ Hypothesis Testing ══╦══ Parametric ══╦══ Paired ══╦══ Matched ═════ Dependent T test
-    |                                                       ║                ║            ╚══ Unmatched ═════ Independent T test
-    |                                                       ║                ║ 
-    |                                                       ║                ╚══ Multiple ══╦══ Matched ═════ One-Way repeated measures ANOVA
-    |                                                       ║                               ╚══ Unmatched ═════ One-Way ANOVA
-    |                                                       ║
-    |                                                       ╚══ Non Parametric ══╦══ Paired ══╦══ Matched ═════ Wilcoxon test
-    |                                                                            ║            ╚══ Unmatched ═════ Mann-Whitney test
-    |                                                                            ║ 
-    |                                                                            ╚══ Multiple ══╦══ Matched ═════ Friedman test
-    |                                                                                           ╚══ Unmatched ═════ Kruskal-Wallis test
+    |              ╚══ Inferencial ══╦══ Normality ══╦══ Kolmogorov-Smirnov test
+    |                                ║               ╠══ Shapiro-Wilk test
+    |                                ║               ╚══ Anderson-Darling test
+    |                                ║               
+    |                                ╠══ Variance Homogeneity ═════ Levene Test
+    |                                ║               
+    |                                ╠══ Effect Size ══╦══ Parametric ═════ T test Effect Size 
+    |                                ║                 ║
+    |                                ║                 ╚══ Non Parametric ══╦══ Mann Whitney Effect Size 
+    |                                ║                                      ╚══ Wilcoxon Effect Size
+    |                                ║               
+    |                                ╚══ Hypothesis Testing ══╦══ Parametric ══╦══ Paired ══╦══ Matched ═════ Dependent T test
+    |                                                         ║                ║            ╚══ Unmatched ═════ Independent T test
+    |                                                         ║                ║ 
+    |                                                         ║                ╚══ Multiple ══╦══ Matched ═════ One-Way repeated measures ANOVA
+    |                                                         ║                               ╚══ Unmatched ═════ One-Way ANOVA
+    |                                                         ║
+    |                                                         ╚══ Non Parametric ══╦══ Paired ══╦══ Matched ═════ Wilcoxon test
+    |                                                                              ║            ╚══ Unmatched ═════ Mann-Whitney test
+    |                                                                              ║ 
+    |                                                                              ╚══ Multiple ══╦══ Matched ═════ Friedman test
+    |                                                                                             ╚══ Unmatched ═════ Kruskal-Wallis test
     """
 
     #-*-# Util #-*-#
@@ -56,7 +56,7 @@ class Statistics:
     def visual_analysis(data, normal=True, show=True):
         figures = []
         for i in range(len(data)):
-            figures.append(Plotter.histogram(Statistics.normalize(data[i]), f"Group {i}", normal=normal, show=show))
+            figures.append(Plotter.histogram(data[i], f"Group {i}", normal=normal, show=show))
         return figures
 
     def normalize(data): # https://www.statisticshowto.com/sigma-sqrt-n-used/
@@ -97,7 +97,7 @@ class Statistics:
         }
         return description 
 
-    #-*-# Inference Statistics #-*-#
+    #-*-# Inferencial Statistics #-*-#
 
     # Normality Tests
 
@@ -144,7 +144,8 @@ class Statistics:
     def friedman(data):
         return st.friedmanchisquare(*data)
     
-    #-*-# Effect Size [Only for paired Comparisons] #-*-# #TODO: Integrate these
+    #-*-# Effect Size [Only for paired Comparisons] #-*-# 
+    #TODO: Integrate these
     
     # Pearson Correlation Coefficient
     def effect_size_t_test(test_statistic, n, independent: bool):
@@ -161,61 +162,72 @@ class Statistics:
 
     #-*-# Analysis #-*-#
 
-    def analyse(df: pd.DataFrame, matched: bool, filename=None, alpha=0.05):
-        samples = len(df.columns)
+    def analyse(df: pd.DataFrame, matched: bool, figures_filename=None, alpha=0.05):
+        with open(Logger.LOG + "statistics.txt", "w") as f:
+            samples = len(df.columns)
+            labels = df.columns
 
-        # Load Data
-        data = Statistics.load(df)
+            # Load Data
+            data = Statistics.load(df)
 
-        # Visual Analysis
-        figures = Statistics.visual_analysis(data, show=False)
-        if filename:
-            Logger.save_figures(figures, filename)
+            # Visual Analysis
+            figures = Statistics.visual_analysis(data, normal=False, show=False)                        # Absolute Histogram
+            figures += Statistics.visual_analysis(Statistics.normalize(data), normal=True, show=False)  # Normal fitted Relative Histogram
+            if figures_filename:
+                Logger.save_figures(figures, figures_filename)
 
-        if samples > 1:
-            paired = True if samples == 2 else False
-
-            # Parametric Assumptions Testing
-
-            # Normality
-            p_values = []
+            # Descriptive Statistics
+            Logger.report("Descriptive Statistics\n", f)
             for i in range(samples):
-                ks, ks_p = Statistics.kolmogorov_smirnov(data[i])
-                sw, sw_p = Statistics.shapiro_wilk(data[i])
-                #ad, ad_p = Statistics.anderson_darling(data[i])
-                #p_values += [ks_p, sw_p, ad_p]
-                p_values += [ks_p, sw_p]
+                description = str(Statistics.describe(data[i])).replace(", '", ",\n\t- ").replace("}", "\n").replace("'","").replace("{","\t- ")
+                Logger.report(labels[i] + ":\n" + description, f)
 
-            # Variance Homogeneity
-            lev, lev_p = Statistics.levene(data)
-            p_values.append(lev_p)
+            # Inferencial Statistics
+            if samples > 1:
+                Logger.report("Inferencial Statistics\n", f)
+                paired = True if samples == 2 else False
 
-            #FIXME: Check if this is right
-            parametric = False if min(p_values) < alpha else True
+                # Parametric Assumptions Testing #
 
-            # Hypothesis Testing
+                # Normality
+                p_values = []
+                for i in range(samples):
+                    ks, ks_p = Statistics.kolmogorov_smirnov(data[i])
+                    p_values.append(ks_p)
 
-            if parametric:
-                if paired:
-                    if matched:
-                        result = Statistics.t_test(data[0], data[1], independent=False)
+                # Variance Homogeneity
+                lev, lev_p = Statistics.levene(data)
+                p_values.append(lev_p)
+                
+                pretty_ks_values = str(list(zip(labels, p_values[:-1]))).replace("), (", "\n\t\t- ").replace("[(","\t\t- ").replace("'","").replace(",", ":").strip(")]")
+                Logger.report(f"Parametric Assumptions:\n\t- Kolmogorov-Smirnov P-Values:\n{pretty_ks_values}\n\t- Levene P-Value: {p_values[-1]}\n" , f)
+
+                parametric = False if min(p_values) < alpha else True
+
+                # Hypothesis Testing #
+                Logger.report(f"Hypothesis Test Parameters:\n\t- Parametric: {parametric}\n\t- Paired: {paired}\n\t- Matched: {matched}\n", f)
+                if parametric:
+                    if paired:
+                        if matched:
+                            result = Statistics.t_test(data[0], data[1], independent=False)
+                        else:
+                            result = Statistics.t_test(data[0], data[1], independent=True)
                     else:
-                        result = Statistics.t_test(data[0], data[1], independent=True)
+                        if matched:
+                            result = Statistics.one_way_anova(data, independent=False)
+                        else:
+                            result = Statistics.one_way_anova(data, independent=True)
                 else:
-                    if matched:
-                        result = Statistics.one_way_anova(data, independent=False)
+                    if paired:
+                        if matched:
+                            result = Statistics.wilcoxon(data[0], data[1])
+                        else:
+                            result = Statistics.mann_whitney(data[0], data[1])
                     else:
-                        result = Statistics.one_way_anova(data, independent=True)
-            else:
-                if paired:
-                    if matched:
-                        result = Statistics.wilcoxon(data[0], data[1])
-                    else:
-                        result = Statistics.mann_whitney(data[0], data[1])
-                else:
-                    if matched:
-                        result = Statistics.friedman(data)
-                    else:
-                        result = Statistics.kruskal_wallis(data)
-            return result
-        return None
+                        if matched:
+                            result = Statistics.friedman(data)
+                        else:
+                            result = Statistics.kruskal_wallis(data)
+                Logger.report(f"Test Result:\n\t- {result}", f)
+                return result
+            return None

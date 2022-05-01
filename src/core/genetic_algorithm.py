@@ -17,36 +17,39 @@ class GeneticAlgorithm:
         self.best_generation = None
 
     def run(self, generations):
-        # TODO: acrescentar variaveis para guardar a geracao onde foi encontrado o best por cada run. Depois precisamos desta informacao guardada num ficheiro para podermos analisar mais tarde com os testes estatísticos.
-        for i in range(generations):
-            print(f"Generation: {i + 1} of {generations}")                              # Logging Info
+        with open(Logger.LOG + "report.txt", "a") as f: 
+            for i in range(generations):
+                # Genetic Algorithm Core
+                parents = self.population.select(self.selection_op)                             # Select Parents
+                offspring = parents.breed(self.crossover_op, self.mutation_op, self.domain)     # Breed (Crossover + Mutation)
+                offspring.evaluate(self.fitness_func)                                           # Evaluate Offspring
+                self.population = self.population.survive(self.survival_op, offspring)          # Select Survivors
 
-            parents = self.population.select(self.selection_op)                         # Select Parents
-            offspring = parents.breed(self.crossover_op, self.mutation_op, self.domain) # Breed (Crossover + Mutation)
-            offspring.evaluate(self.fitness_func)                                       # Evaluate Offspring
-            self.population = self.population.survive(self.survival_op, offspring)      # Select Survivors
-            curr_gen_best = self.population.best()
-            # print(f'best: {self.population.best()}')
-            print(f'best: {curr_gen_best}')
-            self.generations.append(deepcopy(self.population))                          # Logging Info
+                # Update best
+                current_generation_best = self.population.best()
+                if self.best is None or self.best.fitness > current_generation_best.fitness:
+                    self.best = current_generation_best
+                    self.best_generation = i
+                
+                # Logging
+                print(f"\r\t\t\t- Generation: {i + 1} of {generations}", end="")
+                Logger.report(f"Generation: {i + 1} of {generations}", f)
+                Logger.report(f'Run best:\n{self.best}', f)
+                Logger.report(f'Generation best:\n{current_generation_best}', f)
+                
+                self.generations.append(deepcopy(self.population)), f
 
-            # update best stats
-            if self.best is None or self.best.fitness > curr_gen_best.fitness:          # if better, update
-                self.best = curr_gen_best
-                self.best_generation = i
-
-        print(self.best)                                                                # Logging Info
+            Logger.report(self.best, f)
 
 if __name__ == "__main__":
     # Parameters
     N_POPULATION = 20
     SIZE_CHROMOSOME = 10
     N_GENERATIONS = 500
-    N_RUNS = 1
+    N_RUNS = 3
     LEARNING_RATE = 0.1
-    DOMAIN = [[-5.12, 5.12]] * SIZE_CHROMOSOME  # domain for the sphere function
+    DOMAIN = [[-5.12, 5.12]] * SIZE_CHROMOSOME      # Domain for the sphere function
 
-    filenames = ["default_", "sa_"]
 
     default_ga_example_data = {
         "population" : Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, DOMAIN, Individual), 
@@ -55,7 +58,7 @@ if __name__ == "__main__":
         "selection"  : Selection.tournament(3),
         "survival"   : Survival.elitism(1),
         "fitness"    : Fitness.sphere,                  # Sphere as the target function 
-        "domain"     : DOMAIN                           # domain for each gene of the individual
+        "domain"     : DOMAIN                           # Domain for each gene of the individual
     }
 
     SA_ga_example_data = {
@@ -68,27 +71,55 @@ if __name__ == "__main__":
         "domain"     : DOMAIN                            # Domain for each gene of the individual
     }
 
-    # Running
-    results = []
+    #-*-# Running Algorithms #-*-#
+
     figures = []
+    results_fitness, results_best = [], []
+
+    # Genetic Algorithms related Info
+    filenames = ["default", "sa"]
     labels = ["Default Algorithm", "SA Algorithm"]
     algorithms = ["GeneticAlgorithm(**default_ga_example_data)", "GeneticAlgorithm(**SA_ga_example_data)"]
+
+    
+    # Clear Report File
+    open(Logger.LOG + "report.txt", "w").close()
+    
+    print("Comparing: ")
     for e, filename in enumerate(filenames):
-        runs = []
+        runs_generation, runs_best = [], []
+        print("\nAlgorithm: ", labels[e])
         for i in range(N_RUNS):
+            print("\t- Run: ", i, end="")
             ga: GeneticAlgorithm = eval(algorithms[e])
             ga.run(N_GENERATIONS)
-            runs.append(ga.generations)
+            runs_generation.append(ga.generations)
+            runs_best.append([ga.best_generation, ga.best])
+            print()
     
-        # Logging    
-        df = Logger.save_csv(runs, f"{filename}{N_GENERATIONS}")
-        results.append(df)
-    
-        # Plotting
-        figures.append(Plotter.simple_fitness(df, labels[e], maximize=False, show=False))
-        figures.append(Plotter.fancy_fitness(df, labels[e], show=False))
+        # Logging Fitness
+        df_fitness = Logger.save_fitness_csv(runs_generation, f"{filename}_fitness")
+        results_fitness.append(df_fitness)
 
-    figures += Plotter.box_plot(N_GENERATIONS, [results[0], results[1]], labels=labels, maximize=False, show=False)
-    #FIXME: Probably doesnt use every run at once to make the statistics. Have to check 
-    print(Statistics.analyse(results[0][["Fitness"]].join(results[1][["Fitness"]], lsuffix="_default", rsuffix="_sa"), True, "Normality Hists"))
+        # Logging Best
+        df_best = Logger.save_best_csv(runs_best, f"{filename}_best")
+        results_best.append(df_best)
+
+        # Plotting Fitness
+        figures.append(Plotter.simple_fitness(df_fitness, labels[e], maximize=False, show=False))
+        figures.append(Plotter.fancy_fitness(df_fitness, labels[e], show=False))
+
+    # Save Fitness Figures
+    figures += Plotter.box_plot(N_GENERATIONS, [results_fitness[0], results_fitness[1]], labels=labels, maximize=False, show=False)
     Logger.save_figures(figures, "Last_run")
+
+
+    #-*-# Statistics #-*-#
+
+    #FIXME: Probably doesnt use every run at once to make the statistics. Have to check 
+    fitness_data = results_fitness[0][["Fitness"]].join(results_fitness[1][["Fitness"]], lsuffix="_default", rsuffix="_sa")
+    Statistics.analyse(fitness_data, True, "Normality Hists")
+    
+    print("\nDone: Statistical Analysis\n")
+    print("The runs report is found at report.txt")
+    print("The data statistics is found at statistics.txt")

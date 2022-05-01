@@ -100,7 +100,6 @@ class Plotter:
         plt.hist(data, bins=bins, density=normal)
 
         if normal:
-            print("Passou")
             mu, std = st.norm.fit(data)
             x = np.linspace(*plt.xlim(), 1000)
             plt.plot(x, st.norm.pdf(x, mu, std))

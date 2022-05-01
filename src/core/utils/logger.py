@@ -9,7 +9,7 @@ class Logger:
     OTHERS = DIR + "others/"
 
     @classmethod
-    def save_csv(cls, runs: list, filename):
+    def save_fitness_csv(cls, runs: list, filename):
         with open(cls.LOG + filename + ".csv", "w") as f:
             f.write("Run,Generation,Individual,Fitness\n")
             for r, run in enumerate(runs):
@@ -20,8 +20,19 @@ class Logger:
         return pd.read_csv(cls.LOG + filename + ".csv")
 
     @classmethod
+    def save_best_csv(cls, runs: list, filename):
+        with open(cls.LOG + filename + ".csv", "w") as f:
+            f.write("Run,Generation,Fitness,Chromosome\n")
+            for r, (best_gen, best) in enumerate(runs):
+                f.write(f"{r},{best_gen},{best.fitness},'{best.chromosome}'\n")
+        return pd.read_csv(cls.LOG + filename + ".csv")
+
+    @classmethod
     def save_figures(cls, figures, filename):
         with PdfPages(cls.OTHERS + filename + ".pdf") as pdf:
             for i in range(0, len(figures)):
                 pdf.savefig(figures[i])
+
+    def report(text, filepointer):
+        print(text, file=filepointer)
     
