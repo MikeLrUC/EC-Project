@@ -53,10 +53,10 @@ class Statistics:
     def load(df: pd.DataFrame):
         return df.to_numpy().transpose()
 
-    def visual_analysis(data, show=True):
+    def visual_analysis(data, normal=True, show=True):
         figures = []
         for i in range(len(data)):
-            figures.append(Plotter.histogram(data[i], f"Group {i}", normal=True, show=show))
+            figures.append(Plotter.histogram(Statistics.normalize(data[i]), f"Group {i}", normal=normal, show=show))
         return figures
 
     def normalize(data): # https://www.statisticshowto.com/sigma-sqrt-n-used/
