@@ -85,9 +85,10 @@ if __name__ == "__main__":
         results.append(df)
     
         # Plotting
-        figures.append(Plotter.simple_fitness(df, labels[e], maximize=False))
-        figures.append(Plotter.fancy_fitness(df, labels[e]))
+        figures.append(Plotter.simple_fitness(df, labels[e], maximize=False, show=False))
+        figures.append(Plotter.fancy_fitness(df, labels[e], show=False))
 
-    figures += Plotter.box_plot(N_GENERATIONS, [results[0], results[1]], labels=labels, maximize=False)
-    print(f'figures: {figures}')
+    figures += Plotter.box_plot(N_GENERATIONS, [results[0], results[1]], labels=labels, maximize=False, show=False)
+    #FIXME: Probably doesnt use every run at once to make the statistics. Have to check 
+    print(Statistics.analyse(results[0][["Fitness"]].join(results[1][["Fitness"]], lsuffix="_default", rsuffix="_sa"), True, "Normality Hists"))
     Logger.save_figures(figures, "Last_run")

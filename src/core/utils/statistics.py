@@ -53,10 +53,10 @@ class Statistics:
     def load(df: pd.DataFrame):
         return df.to_numpy().transpose()
 
-    def visual_analysis(data):
+    def visual_analysis(data, show=True):
         figures = []
         for i in range(len(data)):
-            figures.append(Plotter.histogram(data[i], f"Group {i}", normal=True))
+            figures.append(Plotter.histogram(data[i], f"Group {i}", normal=True, show=show))
         return figures
 
     def normalize(data): # https://www.statisticshowto.com/sigma-sqrt-n-used/
@@ -102,7 +102,7 @@ class Statistics:
     # Normality Tests
 
     def kolmogorov_smirnov(data):
-        return st.kstest(Statistics.normalize(data))
+        return st.kstest(Statistics.normalize(data), 'norm')
 
     def shapiro_wilk(data):
         return st.shapiro(Statistics.normalize(data))
@@ -144,7 +144,7 @@ class Statistics:
     def friedman(data):
         return st.friedmanchisquare(*data)
     
-    #-*-# Effect Size [Only for paired Comparisons] #-*-#
+    #-*-# Effect Size [Only for paired Comparisons] #-*-# #TODO: Integrate these
     
     # Pearson Correlation Coefficient
     def effect_size_t_test(test_statistic, n, independent: bool):
@@ -168,7 +168,7 @@ class Statistics:
         data = Statistics.load(df)
 
         # Visual Analysis
-        figures = Statistics.visual_analysis(data)
+        figures = Statistics.visual_analysis(data, show=False)
         if filename:
             Logger.save_figures(figures, filename)
 
@@ -179,20 +179,22 @@ class Statistics:
 
             # Normality
             p_values = []
-            for i in range(df.columns):
+            for i in range(samples):
                 ks, ks_p = Statistics.kolmogorov_smirnov(data[i])
                 sw, sw_p = Statistics.shapiro_wilk(data[i])
-                ad, ad_p = Statistics.anderson_darling(data[i])
-                p_values += [ks_p, sw_p, ad_p]
+                #ad, ad_p = Statistics.anderson_darling(data[i])
+                #p_values += [ks_p, sw_p, ad_p]
+                p_values += [ks_p, sw_p]
 
             # Variance Homogeneity
             lev, lev_p = Statistics.levene(data)
             p_values.append(lev_p)
 
+            #FIXME: Check if this is right
             parametric = False if min(p_values) < alpha else True
 
             # Hypothesis Testing
-            
+
             if parametric:
                 if paired:
                     if matched:

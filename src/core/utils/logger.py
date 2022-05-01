@@ -25,10 +25,3 @@ class Logger:
             for i in range(0, len(figures)):
                 pdf.savefig(figures[i])
     
-    @classmethod
-    def assumptions(cls, data, filename):
-        return
-
-    @classmethod
-    def anova(cls, anova_results: dict, filename):
-        return
