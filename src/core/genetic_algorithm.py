@@ -17,7 +17,7 @@ class GeneticAlgorithm:
         self.best_generation = None
 
     def run(self, generations):
-        with open(Logger.LOG + "report.txt", "a") as f: 
+        with open(Logger.REPORT_FILE, "a") as f: 
             for i in range(generations):
                 # Genetic Algorithm Core
                 parents = self.population.select(self.selection_op)                             # Select Parents
@@ -73,8 +73,11 @@ if __name__ == "__main__":
 
     #-*-# Running Algorithms #-*-#
 
+    # Figures List
     figures = []
-    results_fitness, results_best = [], []
+
+    # Data lists
+    results_all, results_best = [], []
 
     # Genetic Algorithms related Info
     filenames = ["default", "sa"]
@@ -83,9 +86,9 @@ if __name__ == "__main__":
 
     
     # Clear Report File
-    open(Logger.LOG + "report.txt", "w").close()
+    open(Logger.REPORT_FILE, "w").close()
     
-    print("Comparing: ")
+    print("Comparing:")
     for e, filename in enumerate(filenames):
         runs_generation, runs_best = [], []
         print("\nAlgorithm: ", labels[e])
@@ -97,29 +100,36 @@ if __name__ == "__main__":
             runs_best.append([ga.best_generation, ga.best])
             print()
     
-        # Logging Fitness
-        df_fitness = Logger.save_fitness_csv(runs_generation, f"{filename}_fitness")
-        results_fitness.append(df_fitness)
+        # Logging All
+        df_all = Logger.save_all_csv(runs_generation, f"{filename}_all")
+        results_all.append(df_all)
 
         # Logging Best
         df_best = Logger.save_best_csv(runs_best, f"{filename}_best")
         results_best.append(df_best)
 
-        # Plotting Fitness
-        figures.append(Plotter.simple_fitness(df_fitness, labels[e], maximize=False, show=False))
-        figures.append(Plotter.fancy_fitness(df_fitness, labels[e], show=False))
-
-    # Save Fitness Figures
-    figures += Plotter.box_plot(N_GENERATIONS, [results_fitness[0], results_fitness[1]], labels=labels, maximize=False, show=False)
-    Logger.save_figures(figures, "Last_run")
+        # Plotting Fitness Over Generations
+        figures.append(Plotter.simple_fitness(df_all, labels[e], maximize=False, show=False))
+        figures.append(Plotter.fancy_fitness(df_all, labels[e], show=False))
 
 
     #-*-# Statistics #-*-#
+    select_data = lambda df, feature: df[0][[feature]].join(df[1][[feature]], lsuffix=f"_{filenames[0]}", rsuffix=f"_{filenames[1]}")
 
-    #FIXME: Probably doesnt use every run at once to make the statistics. Have to check 
-    fitness_data = results_fitness[0][["Fitness"]].join(results_fitness[1][["Fitness"]], lsuffix="_default", rsuffix="_sa")
-    Statistics.analyse(fitness_data, True, "Normality Hists")
+    # Analyse Fitness Values where the best was found, for each one of the N_RUNS runs
+    fitness_data = select_data(results_best, "Fitness")
+    fitness_data.columns = [ f"[{label}] Fitness" for label in labels]
+    Statistics.analyse(fitness_data, True, Logger.STATISTICS_FITNESS_FILE, "histograms_fitness")
+
+    # Analyse Generation Values where the best was found, for each one of the N_RUNS runs
+    generation_data = select_data(results_best, "Generation")
+    generation_data.columns = [ f"[{label}] Generation" for label in labels]
+    Statistics.analyse(generation_data, True, Logger.STATISTICS_GENERATION_FILE, "histograms_generation")
     
-    print("\nDone: Statistical Analysis\n")
-    print("The runs report is found at report.txt")
-    print("The data statistics is found at statistics.txt")
+    print("\nDone: Statistical Analysis")
+
+    # Save Fitness and Generation Comparison Figures
+    figures.append(Plotter.box_plot(fitness_data, f"Best's Fitness Comparison ({len(fitness_data)} runs)", maximize=False, show=False))
+    figures.append(Plotter.box_plot(generation_data, f"Best's Generation Comparison ({len(generation_data)} runs)", maximize=False, show=False))
+
+    Logger.save_figures(figures, "figures")

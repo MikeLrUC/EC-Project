@@ -1,0 +1,43 @@
+Descriptive Statistics
+
+[Default Algorithm] Fitness:
+	- Minimum: 2.3372996329718583,
+	- Maximum: 5.67668650731483,
+	- Mean: 3.996422213426492,
+	- Standard Deviation: 1.3633809453386376,
+	- Variance: 1.858807602112477,
+	- Median: 3.9752804999927873,
+	- Mode: ModeResult(mode=array([2.33729963]), count=array([1])),
+	- Skew: 0.023256512779122048,
+	- Kurtosis: -1.5,
+	- Q1 - Q2 - Q3: array([3.15629007, 3.9752805 , 4.8259835 ])
+
+[SA Algorithm] Fitness:
+	- Minimum: 1.4125660382643404,
+	- Maximum: 2.377799522141037,
+	- Mean: 1.7763281217386755,
+	- Standard Deviation: 0.42840651186692463,
+	- Variance: 0.18353213940998545,
+	- Median: 1.5386188048106486,
+	- Mode: ModeResult(mode=array([1.41256604]), count=array([1])),
+	- Skew: 0.6614704135981876,
+	- Kurtosis: -1.5000000000000013,
+	- Q1 - Q2 - Q3: array([1.47559242, 1.5386188 , 1.95820916])
+
+Inferencial Statistics
+
+Parametric Assumptions:
+	- Kolmogorov-Smirnov P-Values:
+		- [Default Algorithm] Fitness: 0.8371212760276855
+		- [SA Algorithm] Fitness: 0.33706321686070473
+	- Levene P-Value: 0.2676550467718464
+
+Hypothesis Test Parameters:
+	- Parametric: True
+	- Paired: True
+	- Matched: True
+
+Test Result:
+	- Ttest_relResult(statistic=2.9928494954239726, pvalue=0.09585910815630257)
+	- Effect Size: 0.9041408918436974
+	- Explained: Big effect size

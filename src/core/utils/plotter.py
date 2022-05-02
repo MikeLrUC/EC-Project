@@ -1,3 +1,4 @@
+from struct import unpack
 import numpy as np
 import pandas as pd
 import scipy.stats as st
@@ -19,7 +20,7 @@ class Plotter:
         plt.plot(generations, mean, color="r", label="Average")
         
         # Best Fitness by Generations (All runs)
-        plt.plot(generations, best_results, color="g", label="Best")
+        plt.plot(generations, best_results, color="g", label="Generation Best")
         
         # Text
         plt.title(f"[{algorithm}] Fitness Over Generations ({1 + runs['Run'].max()} runs)")
@@ -49,8 +50,9 @@ class Plotter:
         plt.plot(generations, minimum, color="purple", label="Minimum")
         
         # Fitness Mean +- Std by Generations (All runs)
-        plt.plot(generations, mean + std, color="yellow", label="Standard Deviation")
-        plt.plot(generations, mean - std, color="yellow")
+        #plt.plot(generations, mean + std, color="yellow", label="Standard Deviation")
+        #plt.plot(generations, mean - std, color="yellow")
+        plt.fill_between(generations, (mean - std)["Fitness"], (mean + std)["Fitness"], alpha=0.5 ,color="yellow", label="Standard Deviation")
         
         # Fitness Mean by Generations (All runs)
         plt.plot(generations, mean, color="red", label="Average")
@@ -66,32 +68,37 @@ class Plotter:
         plt.show(block=show)
         return fig
 
-    def box_plot(generation, runs: list, labels=["Algorithm 0", "Algorithm 1"], maximize=False, show=True):
-        n_algorithms = len(runs)
+    def box_plot(df: pd.DataFrame, title, maximize=False, show=True):
+        fig = plt.figure()
+        plt.boxplot(df, labels=df.columns)
+        plt.scatter([1] * len(df[df.columns[0]]), df[df.columns[0]])
+        plt.scatter([2] * len(df[df.columns[1]]), df[df.columns[1]])
+        plt.suptitle(title)
+        # n_algorithms = len(runs)
 
-        data, means, best_results = [], [], []
-        for i, run in enumerate(runs):
-            data.append(run[run["Generation"] == generation][["Run", "Fitness"]].groupby("Run"))
-            means.append(data[i].mean())
-            best_results += [data[i].max() if maximize else data[i].min()]
+        # data, means, best_results = [], [], []
+        # for i, run in enumerate(runs):
+        #     data.append(run[run["Generation"]][["Run", "Fitness"]].groupby("Run"))
+        #     means.append(data[i].mean())
+        #     best_results += [data[i].max() if maximize else data[i].min()]
 
-        # Fitness Comparison of given Generation
-        comparisons = [means, best_results]
+        # # Fitness Comparison of given Generation
+        # comparisons = [means, best_results]
 
-        titles = ["Mean", "Maximum"] if maximize else ["Mean", "Minimum"]
-        colors = ["red", "green"]
+        # titles = ["Mean", "Maximum"] if maximize else ["Mean", "Minimum"]
+        # colors = ["red", "green"]
 
-        figures = []
-        for i, comparison in enumerate(comparisons):
-            fig, _ = plt.subplots(1, n_algorithms)
-            figures.append(fig)
-            plt.suptitle(f"Generation {generation} Fitness {titles[i]} by {1 + runs[0]['Run'].max()} Runs")
-            for j in range(n_algorithms):
-                plt.subplot(1, n_algorithms, j+1)
-                plt.scatter([1] * len(comparison[j]), comparison[j], color=colors[i])
-                plt.boxplot(comparison[j], labels=[labels[j]])
+        # figures = []
+        # for i, comparison in enumerate(comparisons):
+        #     fig, _ = plt.subplots(1, n_algorithms)
+        #     figures.append(fig)
+        #     plt.suptitle(f"Generation {generation} Fitness {titles[i]} ({1 + runs[0]['Run'].max()} runs)")
+        #     for j in range(n_algorithms):
+        #         plt.subplot(1, n_algorithms, j+1)
+        #         plt.scatter([1] * len(comparison[j]), comparison[j], color=colors[i])
+        #         plt.boxplot(comparison[j], labels=[labels[j]])
         plt.show(block=show)
-        return figures
+        return fig
 
     def histogram(data: list, title, bins=25, normal=False, show=True):
         
@@ -104,7 +111,7 @@ class Plotter:
             x = np.linspace(*plt.xlim(), 1000)
             plt.plot(x, st.norm.pdf(x, mu, std))
         
-        plt.title(title)
+        plt.title(f"{title} Histogram")
         plt.xlabel("Values")
         plt.ylabel("Frequency")
         plt.show(block=show)

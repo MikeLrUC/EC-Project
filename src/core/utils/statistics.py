@@ -53,10 +53,10 @@ class Statistics:
     def load(df: pd.DataFrame):
         return df.to_numpy().transpose()
 
-    def visual_analysis(data, normal=True, show=True):
+    def visual_analysis(data, labels, normal=True, show=True):
         figures = []
         for i in range(len(data)):
-            figures.append(Plotter.histogram(data[i], f"Group {i}", normal=normal, show=show))
+            figures.append(Plotter.histogram(data[i], labels[i], normal=normal, show=show))
         return figures
 
     def normalize(data): # https://www.statisticshowto.com/sigma-sqrt-n-used/
@@ -126,9 +126,50 @@ class Statistics:
         return st.ttest_rel(data1, data2)
 
     def one_way_anova(data, independent: bool):
+        # Repeated Measures One-Way anova implementation adapted from the statistics.py provided script 
+        # Evolutionary Computation @ DEI UC 2022
+
         if independent:
             return st.f_oneway(*data)
-        #TODO: Repeated Measures ANOVA
+        
+        df = pd.DataFrame(data).transpose()
+
+        grand_mean = df.values.mean()
+        #grand_variance = data_frame.values.var(ddof=1)
+    
+        row_means = df.mean(axis=1)
+        column_means = df.mean(axis=0)
+    
+        # n = number of subjects; k = number of conditions/treatments
+        n,k = len(df.axes[0]), len(df.axes[1])
+        # total number of measurements
+        N = df.size # or n * k
+    
+        # degrees of freedom
+        df_total = N - 1
+        df_between = k - 1
+        df_subject = n - 1
+        df_within = df_total - df_between
+        df_error = df_within - df_subject   
+        
+        # compute variances
+        SS_between = sum(n*[(m - grand_mean)**2 for m in column_means])   
+        SS_within = sum(sum([(df[col] - column_means[i])**2 for i,col in enumerate(df)]))  
+        SS_subject = sum(k* [(m - grand_mean)**2 for m in row_means])  
+        SS_error = SS_within - SS_subject  
+        SS_total = SS_between + SS_within
+    
+        # Compute Averages
+        MS_between = SS_between / df_between
+        MS_error = SS_error / df_error
+        MS_subject = SS_subject / df_subject
+    
+        # F Statistics
+        F = MS_between / MS_error
+        # p-value
+        p_value = st.f.sf(F, df_between, df_error)   
+    
+        return (F, p_value)
 
     ## Non-Parametric
 
@@ -145,7 +186,6 @@ class Statistics:
         return st.friedmanchisquare(*data)
     
     #-*-# Effect Size [Only for paired Comparisons] #-*-# 
-    #TODO: Integrate these
     
     # Pearson Correlation Coefficient
     def effect_size_t_test(test_statistic, n, independent: bool):
@@ -162,8 +202,8 @@ class Statistics:
 
     #-*-# Analysis #-*-#
 
-    def analyse(df: pd.DataFrame, matched: bool, figures_filename=None, alpha=0.05):
-        with open(Logger.LOG + "statistics.txt", "w") as f:
+    def analyse(df: pd.DataFrame, matched: bool, logging_file, figures_filename=None, alpha=0.05):
+        with open(logging_file, "w") as f:
             samples = len(df.columns)
             labels = df.columns
 
@@ -171,8 +211,8 @@ class Statistics:
             data = Statistics.load(df)
 
             # Visual Analysis
-            figures = Statistics.visual_analysis(data, normal=False, show=False)                        # Absolute Histogram
-            figures += Statistics.visual_analysis(Statistics.normalize(data), normal=True, show=False)  # Normal fitted Relative Histogram
+            figures = Statistics.visual_analysis(data, labels, normal=False, show=False)                        # Absolute Histogram
+            figures += Statistics.visual_analysis(Statistics.normalize(data), labels, normal=True, show=False)  # Normal fitted Relative Histogram
             if figures_filename:
                 Logger.save_figures(figures, figures_filename)
 
@@ -206,12 +246,16 @@ class Statistics:
 
                 # Hypothesis Testing #
                 Logger.report(f"Hypothesis Test Parameters:\n\t- Parametric: {parametric}\n\t- Paired: {paired}\n\t- Matched: {matched}\n", f)
+                
+                effect_size = None
                 if parametric:
                     if paired:
                         if matched:
                             result = Statistics.t_test(data[0], data[1], independent=False)
+                            effect_size = Statistics.effect_size_t_test(result.statistic, len(data[0]), False)
                         else:
                             result = Statistics.t_test(data[0], data[1], independent=True)
+                            effect_size = Statistics.effect_size_t_test(result.statistic, len(data[0]), True)
                     else:
                         if matched:
                             result = Statistics.one_way_anova(data, independent=False)
@@ -221,13 +265,29 @@ class Statistics:
                     if paired:
                         if matched:
                             result = Statistics.wilcoxon(data[0], data[1])
+                            effect_size = Statistics.effect_size_wilcoxon(result.statistic, np.count_nonzero(data[0] - data[1]), len(data[0]) + len(data[1]))
                         else:
                             result = Statistics.mann_whitney(data[0], data[1])
+                            effect_size = Statistics.effect_size_mann_whitney(result.statistic, len(data[0]), len(data[1]), len(data[0]) + len(data[1]))
                     else:
                         if matched:
                             result = Statistics.friedman(data)
                         else:
                             result = Statistics.kruskal_wallis(data)
+                
+                if effect_size:
+                    if 0 <= abs(effect_size) < 0.3:
+                        explained = "Small"
+                    elif 0.3 <= abs(effect_size) < 0.5:
+                        explained = "Medium"
+                    else:
+                        explained = "Big"
+                else:
+                    explained = None
+                    
                 Logger.report(f"Test Result:\n\t- {result}", f)
+                Logger.report(f"\t- Effect Size: {effect_size}", f)
+
+                Logger.report(f"\t- Explained: {explained} effect size", f)
                 return result
             return None

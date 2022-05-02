@@ -1,0 +1,43 @@
+Descriptive Statistics
+
+[Default Algorithm] Generation:
+	- Minimum: 407,
+	- Maximum: 432,
+	- Mean: 420.0,
+	- Standard Deviation: 10.23067283548187,
+	- Variance: 104.66666666666667,
+	- Median: 421.0,
+	- Mode: ModeResult(mode=array([407]), count=array([1])),
+	- Skew: -0.14568405068173707,
+	- Kurtosis: -1.5,
+	- Q1 - Q2 - Q3: array([414. , 421. , 426.5])
+
+[SA Algorithm] Generation:
+	- Minimum: 165,
+	- Maximum: 430,
+	- Mean: 325.6666666666667,
+	- Standard Deviation: 115.28611750288448,
+	- Variance: 13290.888888888889,
+	- Median: 382.0,
+	- Mode: ModeResult(mode=array([165]), count=array([1])),
+	- Skew: -0.6162873809292531,
+	- Kurtosis: -1.4999999999999993,
+	- Q1 - Q2 - Q3: array([273.5, 382. , 406. ])
+
+Inferencial Statistics
+
+Parametric Assumptions:
+	- Kolmogorov-Smirnov P-Values:
+		- [Default Algorithm] Generation: 0.8287743447465146
+		- [SA Algorithm] Generation: 0.411734952453794
+	- Levene P-Value: 0.291825181896277
+
+Hypothesis Test Parameters:
+	- Parametric: True
+	- Paired: True
+	- Matched: True
+
+Test Result:
+	- Ttest_relResult(statistic=1.1630933652876698, pvalue=0.3647983028990719)
+	- Effect Size: 0.6352016971009281
+	- Explained: Big effect size

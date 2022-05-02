@@ -1,15 +1,17 @@
 import pandas as pd
 
 from matplotlib.backends.backend_pdf import PdfPages
-from tabulate import tabulate
 
 class Logger:
     DIR = __file__.split("core")[0] + "data/"
     LOG = DIR + "log/"
     OTHERS = DIR + "others/"
+    REPORT_FILE = OTHERS + "report.txt"
+    STATISTICS_FITNESS_FILE = OTHERS + "statistics_fitness.txt"
+    STATISTICS_GENERATION_FILE = OTHERS + "statistics_generation.txt"
 
     @classmethod
-    def save_fitness_csv(cls, runs: list, filename):
+    def save_all_csv(cls, runs: list, filename):
         with open(cls.LOG + filename + ".csv", "w") as f:
             f.write("Run,Generation,Individual,Fitness\n")
             for r, run in enumerate(runs):
@@ -24,7 +26,7 @@ class Logger:
         with open(cls.LOG + filename + ".csv", "w") as f:
             f.write("Run,Generation,Fitness,Chromosome\n")
             for r, (best_gen, best) in enumerate(runs):
-                f.write(f"{r},{best_gen},{best.fitness},'{best.chromosome}'\n")
+                f.write(f"{r},{best_gen},{best.fitness},\"{best.chromosome}\"\n")
         return pd.read_csv(cls.LOG + filename + ".csv")
 
     @classmethod
