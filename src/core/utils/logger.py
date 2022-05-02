@@ -7,8 +7,10 @@ class Logger:
     LOG = DIR + "log/"
     OTHERS = DIR + "others/"
     REPORT_FILE = OTHERS + "report.txt"
-    STATISTICS_FITNESS_FILE = OTHERS + "statistics_fitness.txt"
-    STATISTICS_GENERATION_FILE = OTHERS + "statistics_generation.txt"
+    CSV_FILE = lambda problem, algorithm, dtype: f"{problem}_{algorithm}_{dtype}"
+    HIST_FILE = lambda problem, dtype: f"{problem}_histograms_{dtype}"
+    STATISTICS_FILE = lambda problem, dtype: f"{problem}_statistics_{dtype}.txt"
+    FIGURES_FILE = lambda problem: f"{problem}_figures" 
 
     @classmethod
     def save_all_csv(cls, runs: list, filename):

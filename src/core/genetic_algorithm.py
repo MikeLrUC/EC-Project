@@ -43,10 +43,10 @@ class GeneticAlgorithm:
 
 if __name__ == "__main__":
     # Parameters
-    N_POPULATION = 20
+    N_POPULATION = 20                               #FIXME: Talvez reduzir para 10 dimensões?
     SIZE_CHROMOSOME = 10
     N_GENERATIONS = 500
-    N_RUNS = 3
+    N_RUNS = 30
     LEARNING_RATE = 0.1
     DOMAIN = [[-5.12, 5.12]] * SIZE_CHROMOSOME      # Domain for the sphere function
 
@@ -73,63 +73,76 @@ if __name__ == "__main__":
 
     #-*-# Running Algorithms #-*-#
 
-    # Figures List
-    figures = []
-
-    # Data lists
-    results_all, results_best = [], []
-
     # Genetic Algorithms related Info
     filenames = ["default", "sa"]
     labels = ["Default Algorithm", "SA Algorithm"]
     algorithms = ["GeneticAlgorithm(**default_ga_example_data)", "GeneticAlgorithm(**SA_ga_example_data)"]
-
+    benchmarks = [Fitness.sphere, Fitness.rosenbrock, Fitness.step]
     
     # Clear Report File
     open(Logger.REPORT_FILE, "w").close()
-    
-    print("Comparing:")
-    for e, filename in enumerate(filenames):
-        runs_generation, runs_best = [], []
-        print("\nAlgorithm: ", labels[e])
-        for i in range(N_RUNS):
-            print("\t- Run: ", i, end="")
-            ga: GeneticAlgorithm = eval(algorithms[e])
-            ga.run(N_GENERATIONS)
-            runs_generation.append(ga.generations)
-            runs_best.append([ga.best_generation, ga.best])
-            print()
-    
-        # Logging All
-        df_all = Logger.save_all_csv(runs_generation, f"{filename}_all")
-        results_all.append(df_all)
 
-        # Logging Best
-        df_best = Logger.save_best_csv(runs_best, f"{filename}_best")
-        results_best.append(df_best)
+    for benchmark in benchmarks:
 
-        # Plotting Fitness Over Generations
-        figures.append(Plotter.simple_fitness(df_all, labels[e], maximize=False, show=False))
-        figures.append(Plotter.fancy_fitness(df_all, labels[e], show=False))
+        # Benchmark Problem
+        problem = benchmark.__name__
+        print(f"Problem: {problem}")
+        
+        # Set Fitness Functions for problem at hand
+        default_ga_example_data["fitness"] = benchmark
+        SA_ga_example_data["fitness"] = benchmark
+
+        # Figures
+        figures = []
+
+        # Data lists
+        results_all, results_best = [], []
+        
+        for e, filename in enumerate(filenames):    # Algorithms
+            runs_generation, runs_best = [], []
+            print("\nAlgorithm: ", labels[e])
+            for i in range(N_RUNS):
+                print("\t- Run: ", i, end="")
+                ga: GeneticAlgorithm = eval(algorithms[e])
+                ga.run(N_GENERATIONS)
+                runs_generation.append(ga.generations)
+                runs_best.append([ga.best_generation, ga.best])
+                print()
+        
+            # Logging All
+            df_all = Logger.save_all_csv(runs_generation, Logger.CSV_FILE(problem, filename, "all"))
+            results_all.append(df_all)
+
+            # Logging Best
+            df_best = Logger.save_best_csv(runs_best, Logger.CSV_FILE(problem, filename, "best"))
+            results_best.append(df_best)
+
+            # Plotting Fitness Over Generations
+            figures.append(Plotter.simple_fitness(df_all, labels[e], maximize=False, show=False))
+            figures.append(Plotter.fancy_fitness(df_all, labels[e], show=False))
 
 
-    #-*-# Statistics #-*-#
-    select_data = lambda df, feature: df[0][[feature]].join(df[1][[feature]], lsuffix=f"_{filenames[0]}", rsuffix=f"_{filenames[1]}")
+        #-*-# Statistics #-*-#
+        select_data = lambda df, feature: df[0][[feature]].join(df[1][[feature]], lsuffix=f"_{filenames[0]}", rsuffix=f"_{filenames[1]}")
 
-    # Analyse Fitness Values where the best was found, for each one of the N_RUNS runs
-    fitness_data = select_data(results_best, "Fitness")
-    fitness_data.columns = [ f"[{label}] Fitness" for label in labels]
-    Statistics.analyse(fitness_data, True, Logger.STATISTICS_FITNESS_FILE, "histograms_fitness")
+        # Analyse Fitness Values where the best was found, for each one of the N_RUNS runs
+        fitness_data = select_data(results_best, "Fitness")
+        fitness_data.columns = [ f"[{label}] Fitness" for label in labels]
+        Statistics.analyse(fitness_data, True, Logger.STATISTICS_FILE(problem, "fitness"), Logger.HIST_FILE(problem, "fitness"))
 
-    # Analyse Generation Values where the best was found, for each one of the N_RUNS runs
-    generation_data = select_data(results_best, "Generation")
-    generation_data.columns = [ f"[{label}] Generation" for label in labels]
-    Statistics.analyse(generation_data, True, Logger.STATISTICS_GENERATION_FILE, "histograms_generation")
-    
-    print("\nDone: Statistical Analysis")
+        # Analyse Generation Values where the best was found, for each one of the N_RUNS runs
+        generation_data = select_data(results_best, "Generation")
+        generation_data.columns = [ f"[{label}] Generation" for label in labels]
+        Statistics.analyse(generation_data, True, Logger.STATISTICS_FILE(problem, "generation"), Logger.HIST_FILE(problem, "generation"))
+        
+        print("\nDone: Statistical Analysis\n")
 
-    # Save Fitness and Generation Comparison Figures
-    figures.append(Plotter.box_plot(fitness_data, f"Best's Fitness Comparison ({len(fitness_data)} runs)", maximize=False, show=False))
-    figures.append(Plotter.box_plot(generation_data, f"Best's Generation Comparison ({len(generation_data)} runs)", maximize=False, show=False))
+        # Save Fitness and Generation Comparison Figures
+        figures.append(Plotter.box_plot(fitness_data, f"Best's Fitness Comparison ({len(fitness_data)} runs)", show=False))
+        figures.append(Plotter.box_plot(generation_data, f"Best's Generation Comparison ({len(generation_data)} runs)", show=False))
 
-    Logger.save_figures(figures, "figures")
+        Logger.save_figures(figures, Logger.FIGURES_FILE(problem))
+        
+        # Close Figures because of Memory
+        Plotter.close()
+

@@ -202,8 +202,8 @@ class Statistics:
 
     #-*-# Analysis #-*-#
 
-    def analyse(df: pd.DataFrame, matched: bool, logging_file, figures_filename=None, alpha=0.05):
-        with open(logging_file, "w") as f:
+    def analyse(df: pd.DataFrame, matched: bool, logging_file, figures_file, alpha=0.05):
+        with open(Logger.OTHERS + logging_file, "w") as f:
             samples = len(df.columns)
             labels = df.columns
 
@@ -213,8 +213,8 @@ class Statistics:
             # Visual Analysis
             figures = Statistics.visual_analysis(data, labels, normal=False, show=False)                        # Absolute Histogram
             figures += Statistics.visual_analysis(Statistics.normalize(data), labels, normal=True, show=False)  # Normal fitted Relative Histogram
-            if figures_filename:
-                Logger.save_figures(figures, figures_filename)
+            if figures_file:
+                Logger.save_figures(figures, figures_file)
 
             # Descriptive Statistics
             Logger.report("Descriptive Statistics\n", f)
