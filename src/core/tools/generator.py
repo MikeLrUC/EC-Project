@@ -20,7 +20,6 @@ class Generator:
         '''
         return (interval[1] - interval[0]) * rd.random() + interval[0]
     
-    #TODO: Miguel review this
     def new_gene_SA(old_gene, std):
         '''
         old_gene: the value that the current gene has.
