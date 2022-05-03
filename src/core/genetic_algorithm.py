@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
 
         #-*-# Statistics #-*-#
-        select_data = lambda df, feature: df[0][[feature]].join(df[1][[feature]], lsuffix=f"_{filenames[0]}", rsuffix=f"_{filenames[1]}")
+        select_data = lambda results, feature: results[0][[feature]].join(results[1][[feature]], lsuffix=f"_{filenames[0]}", rsuffix=f"_{filenames[1]}")
 
         # Analyse Fitness Values where the best was found, for each one of the N_RUNS runs
         fitness_data = select_data(results_best, "Fitness")
