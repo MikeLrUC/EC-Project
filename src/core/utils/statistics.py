@@ -242,7 +242,7 @@ class Statistics:
                 pretty_ks_values = str(list(zip(labels, p_values[:-1]))).replace("), (", "\n\t\t- ").replace("[(","\t\t- ").replace("'","").replace(",", ":").strip(")]")
                 Logger.report(f"Parametric Assumptions:\n\t- Kolmogorov-Smirnov P-Values:\n{pretty_ks_values}\n\t- Levene P-Value: {p_values[-1]}\n" , f)
 
-                parametric = False if min(p_values) < alpha else True
+                parametric = False if min(p_values) <= alpha else True
 
                 # Hypothesis Testing #
                 Logger.report(f"Hypothesis Test Parameters:\n\t- Parametric: {parametric}\n\t- Paired: {paired}\n\t- Matched: {matched}\n", f)
@@ -286,6 +286,7 @@ class Statistics:
                     explained = None
                     
                 Logger.report(f"Test Result:\n\t- {result}", f)
+                Logger.report(f"\t- Explained: {'Reject H0' if result.pvalue <= alpha else 'Not Reject H0'} ", f)
                 Logger.report(f"\t- Effect Size: {effect_size}", f)
 
                 Logger.report(f"\t- Explained: {explained} effect size", f)

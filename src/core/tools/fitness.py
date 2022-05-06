@@ -46,7 +46,7 @@ class Fitness:
         domain -> [-1.28, 1.28] * genes_size
         '''
         genes = chromosome[: genes_size]
-        fitness = sum([i * genes[i]**4 for i in range(genes_size)]) + np.random.normal(0, 1)
+        fitness = sum([(i + 1) * genes[i]**4 for i in range(genes_size)]) + np.random.normal(0, 1)
         return fitness
     
     def rastrigin(chromosome, genes_size):
@@ -80,5 +80,5 @@ class Fitness:
         domain -> [-600, 600] * genes_size
         '''
         genes = chromosome[: genes_size]
-        fitness = 1 + (1 / 4000) * sum([gene**2 for gene in genes]) + prod([cos(genes[i] / sqrt(i)) for i in range(genes_size)])
+        fitness = 1 + (1 / 4000) * sum([gene**2 for gene in genes]) - prod([cos(genes[i] / sqrt(i + 1)) for i in range(genes_size)])
         return fitness
