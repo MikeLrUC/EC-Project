@@ -57,6 +57,7 @@ if __name__ == "__main__":
     N_POPULATION = 10                            
     SIZE_CHROMOSOME = 20
     LEARNING_RATE = 0.1
+    STD_DOMAIN = [0, 1]
     SEEDS = [rd.randint(0, 10000) for _ in range(N_RUNS)]
     
     #-*-# Running Algorithms #-*-#
@@ -81,7 +82,7 @@ if __name__ == "__main__":
         
         # Algorithms
         default = {
-            "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual), 
+            "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual, STD_DOMAIN), 
             "crossover"  : Crossover.n_point_crossover(2),
             "mutation"   : Mutation.default(0.5),           # Mutation for the Default GA
             "selection"  : Selection.tournament(3),
@@ -91,7 +92,7 @@ if __name__ == "__main__":
         }
 
         sa = {
-            "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual_SA), 
+            "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual_SA, STD_DOMAIN), 
             "crossover"  : Crossover.n_point_crossover(2),
             "mutation"   : Mutation.SA(0.5, LEARNING_RATE),  # Mutation for the SA GA
             "selection"  : Selection.tournament(3),

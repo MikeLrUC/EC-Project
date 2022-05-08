@@ -5,7 +5,7 @@ from .population import Population
 
 class Generator:
 
-    def random_float_generation(chromosome_size, population_size, domain, Individual_constructor):
+    def random_float_generation(chromosome_size, population_size, domain, Individual_constructor, std_domain):
         '''
         chromosome_size: size of the genotype of the individual.
         population_size: size of the population.
@@ -13,7 +13,7 @@ class Generator:
         Individual_constructor: constructor for the type of individual that we want.
         '''
         def generate():
-            return Population( [Individual_constructor( [Generator.pick_value_in_interval(domain[i]) for i in range(chromosome_size)], None ) for _ in range(population_size)] )
+            return Population( [Individual_constructor( [Generator.pick_value_in_interval(domain[i]) for i in range(chromosome_size)], None, std_domain) for _ in range(population_size)] )
         return generate 
     
     def pick_value_in_interval(interval):

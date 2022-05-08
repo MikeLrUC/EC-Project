@@ -18,7 +18,8 @@ if __name__ == "__main__":
     parameters = {
         "Mutation Probability": [0.1, 0.3, 0.5],
         "Population": [10, 20, 30],
-        "Learning Rate": [0.1, 0.5, 0.9]
+        "Learning Rate": [0.1, 0.5, 0.9],
+        "Std Domain": [[0,1], [1,1], [-1, 1]]
     }
 
     # Parameters Fixed, while testing some
@@ -28,7 +29,8 @@ if __name__ == "__main__":
         "Learning Rate": 0.1,
         "N Point Crossover": 2,
         "Tournament Size": 3,
-        "Elitism Size": 1
+        "Elitism Size": 1,
+        "Std Domain": [0, 1]
     }
 
     # Run Seed Generator Seed
@@ -36,8 +38,8 @@ if __name__ == "__main__":
     
     # Configs
     N_RUNS = 30
-    N_GENERATIONS = 1000
-    SIZE_CHROMOSOME = 10
+    N_GENERATIONS = 1
+    SIZE_CHROMOSOME = 20
     SEEDS = [rd.randint(0, 10000) for _ in range(N_RUNS)]   
 
     benchmarks = [
@@ -94,7 +96,7 @@ if __name__ == "__main__":
             }
 
             # For possible values for the current testing parameter
-            for value in values:
+            for v, value in enumerate(values):
                 print(f"\n\nTesting: {param_name} [{value}]")
                 
                 # Overwrite default parameter
@@ -102,7 +104,7 @@ if __name__ == "__main__":
 
                 # Default Algorithm Data
                 default = {
-                    "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, default_params["Population"], [domain] * SIZE_CHROMOSOME, Individual), 
+                    "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, default_params["Population"], [domain] * SIZE_CHROMOSOME, Individual, default_params["Std Domain"]), 
                     "crossover"  : Crossover.n_point_crossover(default_params["N Point Crossover"]),
                     "mutation"   : Mutation.default(default_params["Mutation Probability"]),           # Mutation for the Default GA
                     "selection"  : Selection.tournament(default_params["Tournament Size"]),
@@ -113,7 +115,7 @@ if __name__ == "__main__":
 
                 # Self-Adaptation Algorithm Data
                 sa = {
-                    "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, default_params["Population"], [domain] * SIZE_CHROMOSOME, Individual_SA), 
+                    "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, default_params["Population"], [domain] * SIZE_CHROMOSOME, Individual_SA, default_params["Std Domain"]), 
                     "crossover"  : Crossover.n_point_crossover(default_params["N Point Crossover"]),
                     "mutation"   : Mutation.SA(default_params["Mutation Probability"], default_params["Learning Rate"]),  # Mutation for the SA GA
                     "selection"  : Selection.tournament(default_params["Tournament Size"]),
@@ -145,10 +147,10 @@ if __name__ == "__main__":
                     # Pick Best
                     best = sorted(runs_best, key=lambda best: best[1].fitness)[0]
                     
-                    problems_results[benchmark.__name__][name]["fitness"]["param_value"].append(value)
+                    problems_results[benchmark.__name__][name]["fitness"]["param_value"].append(v)
                     problems_results[benchmark.__name__][name]["fitness"]["score"].append(best[1].fitness) 
 
-                    problems_results[benchmark.__name__][name]["generation"]["param_value"].append(value)
+                    problems_results[benchmark.__name__][name]["generation"]["param_value"].append(v)
                     problems_results[benchmark.__name__][name]["generation"]["score"].append(best[0]) 
             
             for i, (name, data) in enumerate(algorithms):
@@ -169,7 +171,8 @@ if __name__ == "__main__":
         # Fitness Plot Labels
         plot = axs[0]
         plot.set_xlabel(param_name)
-        plot.set_xticks(values)
+        plot.set_xticks([i for i in range(len(values))])
+        plot.xaxis.set_ticklabels([str(value) for value in values])
         plot.set_ylabel("Algorithm")
         plot.set_yticks([0, 1])
         plot.yaxis.set_ticklabels(["Default", "SA"])
@@ -181,7 +184,8 @@ if __name__ == "__main__":
         # Generation Plot Labels
         plot = axs[1]
         plot.set_xlabel(param_name)
-        plot.set_xticks(values)
+        plot.set_xticks([i for i in range(len(values))])
+        plot.xaxis.set_ticklabels([str(value) for value in values])
         plot.set_ylabel("Algorithm")
         plot.set_yticks([0, 1])
         plot.yaxis.set_ticklabels(["Default", "SA"])

@@ -2,7 +2,7 @@ import random as rd
 
 class Individual:
 
-    def __init__(self, chromosome, fitness):
+    def __init__(self, chromosome, fitness, domain):
         self.chromosome = chromosome
         self.fitness = fitness
         self.genes_size = len(chromosome)
@@ -20,11 +20,10 @@ class Individual:
         return self
 
 class Individual_SA(Individual):
-    def __init__(self, chromosome, fitness):
+    def __init__(self, chromosome, fitness, domain):
         # all genes start with std = 1, so we will have the distribution N(0,1)
         # This values can be changed during execution time
         #stds = [1] * len(chromosome) # list with the standard deviations of the normal distributions of each gene
-        domain = [0, 1]
         stds = [domain[0] + (domain[1] - domain[0]) * rd.random() for _ in range(len(chromosome))]
         self.chromosome = chromosome + stds # by combining the two, we can use the same crossover function for both algorithms
         self.fitness = fitness
