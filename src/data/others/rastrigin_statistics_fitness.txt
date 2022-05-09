@@ -1,0 +1,44 @@
+Descriptive Statistics
+
+[Default Algorithm] Fitness:
+	- Minimum: 0.8399176916477984,
+	- Maximum: 2.57886856029603,
+	- Mean: 1.5226974120146963,
+	- Standard Deviation: 0.4181336811193108,
+	- Variance: 0.1748357752863855,
+	- Median: 1.3726170734604466,
+	- Mode: ModeResult(mode=array([0.83991769]), count=array([1])),
+	- Skew: 0.541214343451794,
+	- Kurtosis: -0.40619491218047266,
+	- Q1 - Q2 - Q3: array([1.23520814, 1.37261707, 1.87915608])
+
+[SA Algorithm] Fitness:
+	- Minimum: 1.0271388226043427,
+	- Maximum: 22.887314083060687,
+	- Mean: 10.31212819345856,
+	- Standard Deviation: 6.467501947766434,
+	- Variance: 41.82858144436261,
+	- Median: 8.144864615894349,
+	- Mode: ModeResult(mode=array([1.02713882]), count=array([1])),
+	- Skew: 0.4139148390922584,
+	- Kurtosis: -1.1483186219686001,
+	- Q1 - Q2 - Q3: array([ 5.09786621,  8.14486462, 15.00847815])
+
+Inferencial Statistics
+
+Parametric Assumptions:
+	- Kolmogorov-Smirnov P-Values:
+		- [Default Algorithm] Fitness: 2.0723315848918096e-07
+		- [SA Algorithm] Fitness: 2.734712802446232e-07
+	- Levene P-Value: 1.5746081391551413e-09
+
+Hypothesis Test Parameters:
+	- Parametric: False
+	- Paired: True
+	- Matched: True
+
+Test Result:
+	- WilcoxonResult(statistic=2.0, pvalue=2.1266360107314253e-06)
+	- Explained: Reject H0 
+	- Effect Size: -0.6120607549146414
+	- Explained: Big effect size
