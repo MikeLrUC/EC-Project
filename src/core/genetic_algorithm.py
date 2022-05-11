@@ -83,7 +83,7 @@ if __name__ == "__main__":
         # Algorithms
         default = {
             "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual, STD_DOMAIN), 
-            "crossover"  : Crossover.n_point_crossover(2),
+            "crossover"  : Crossover.n_point_crossover(2, 0.8),
             "mutation"   : Mutation.default(0.5),           # Mutation for the Default GA
             "selection"  : Selection.tournament(3),
             "survival"   : Survival.elitism(1),
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
         sa = {
             "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual_SA, STD_DOMAIN), 
-            "crossover"  : Crossover.n_point_crossover(2),
+            "crossover"  : Crossover.n_point_crossover(2, 0.8),
             "mutation"   : Mutation.SA(0.5, LEARNING_RATE),  # Mutation for the SA GA
             "selection"  : Selection.tournament(3),
             "survival"   : Survival.elitism(1),

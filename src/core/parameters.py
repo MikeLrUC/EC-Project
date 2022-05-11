@@ -17,20 +17,22 @@ if __name__ == "__main__":
     # Parameters to Test
     parameters = {
         "Mutation Probability": [0.1, 0.3, 0.5],
-        "Population": [10, 20, 30],
+        "Population": [100, 200, 300],
         "Learning Rate": [0.1, 0.5, 0.9],
-        "Std Domain": [[0,1], [1,1], [-1, 1]]
+        "Std Domain": [[0,1], [1,1]],
+        "Crossover Probability": [0.7, 0.8, 0.9]
     }
 
     # Parameters Fixed, while testing some
     fixed_parameters = {
         "Mutation Probability": 0.1,
-        "Population": 10,
+        "Population": 100,
         "Learning Rate": 0.1,
         "N Point Crossover": 2,
         "Tournament Size": 3,
         "Elitism Size": 1,
-        "Std Domain": [0, 1]
+        "Std Domain": [0, 1],
+        "Crossover Probability": 0.8
     }
 
     # Run Seed Generator Seed
@@ -105,7 +107,7 @@ if __name__ == "__main__":
                 # Default Algorithm Data
                 default = {
                     "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, default_params["Population"], [domain] * SIZE_CHROMOSOME, Individual, default_params["Std Domain"]), 
-                    "crossover"  : Crossover.n_point_crossover(default_params["N Point Crossover"]),
+                    "crossover"  : Crossover.n_point_crossover(default_params["N Point Crossover"], default_params["Crossover Probability"]),
                     "mutation"   : Mutation.default(default_params["Mutation Probability"]),           # Mutation for the Default GA
                     "selection"  : Selection.tournament(default_params["Tournament Size"]),
                     "survival"   : Survival.elitism(default_params["Elitism Size"]),
@@ -116,7 +118,7 @@ if __name__ == "__main__":
                 # Self-Adaptation Algorithm Data
                 sa = {
                     "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, default_params["Population"], [domain] * SIZE_CHROMOSOME, Individual_SA, default_params["Std Domain"]), 
-                    "crossover"  : Crossover.n_point_crossover(default_params["N Point Crossover"]),
+                    "crossover"  : Crossover.n_point_crossover(default_params["N Point Crossover"], default_params["Crossover Probability"]),
                     "mutation"   : Mutation.SA(default_params["Mutation Probability"], default_params["Learning Rate"]),  # Mutation for the SA GA
                     "selection"  : Selection.tournament(default_params["Tournament Size"]),
                     "survival"   : Survival.elitism(default_params["Elitism Size"]),

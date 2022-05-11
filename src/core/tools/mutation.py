@@ -33,11 +33,12 @@ class Mutation:
             individual: the individual that we want to mutate.
             domain: list with the intervals where each gene should belong to.
             '''
-            # Mutate genes
-            new_genes = [min(max(Generator.new_gene_SA(individual.chromosome[i], individual.chromosome[i + individual.genes_size]), domain[i][0]), domain[i][1]) for i in range(individual.genes_size)]
-
             # Mutate stds
             new_stds = [Generator.new_std_SA(individual.chromosome[i + individual.genes_size], learning_rate) for i in range(individual.genes_size)]
+
+            # Mutate genes
+            new_genes = [min(max(Generator.new_gene_SA(individual.chromosome[i], new_stds[i]), domain[i][0]), domain[i][1]) for i in range(individual.genes_size)]
+
 
             # Build Chromosome
             individual.chromosome = new_genes + new_stds
