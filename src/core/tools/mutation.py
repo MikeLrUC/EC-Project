@@ -34,10 +34,10 @@ class Mutation:
             domain: list with the intervals where each gene should belong to.
             '''
             # Mutate stds
-            new_stds = [Generator.new_std_SA(individual.chromosome[i + individual.genes_size], learning_rate) for i in range(individual.genes_size)]
+            new_stds = [Generator.new_std_SA(individual.chromosome[i + individual.genes_size], learning_rate) if rd.random() < probability else individual.chromosome[i + individual.genes_size] for i in range(individual.genes_size)]
 
             # Mutate genes
-            new_genes = [min(max(Generator.new_gene_SA(individual.chromosome[i], new_stds[i]), domain[i][0]), domain[i][1]) for i in range(individual.genes_size)]
+            new_genes = [min(max(Generator.new_gene_SA(individual.chromosome[i], new_stds[i]), domain[i][0]), domain[i][1]) if rd.random() < probability else individual.chromosome[i] for i in range(individual.genes_size)]
 
 
             # Build Chromosome

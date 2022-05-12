@@ -16,11 +16,11 @@ if __name__ == "__main__":
 
     # Parameters to Test
     parameters = {
-        "Mutation Probability": [0.1, 0.3, 0.5],
-        "Population": [100, 200, 300],
-        "Learning Rate": [0.1, 0.5, 0.9],
-        "Std Domain": [[0,1], [1,1]],
-        "Crossover Probability": [0.7, 0.8, 0.9]
+        #"Mutation Probability": [0.1, 0.3],
+        "Population": [100, 150],
+        #"Learning Rate": [0.1, 0.5, 0.9],
+        #"Std Domain": [[0,1], [1,1]],
+        #"Crossover Probability": [0.7, 0.8]
     }
 
     # Parameters Fixed, while testing some
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     
     # Configs
     N_RUNS = 30
-    N_GENERATIONS = 1
+    N_GENERATIONS = 300
     SIZE_CHROMOSOME = 20
     SEEDS = [rd.randint(0, 10000) for _ in range(N_RUNS)]   
 
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         [Fitness.quartic, [-1.28, 1.28]], 
         [Fitness.rastrigin, [-5.12, 5.12]],
         #[Fitness.schwefel, [-500, 500]], # Commented bc the target fitness is -XXXX .... that messes up the scale to the others
-        [Fitness.griewangk, [-600, 600]] 
+        #[Fitness.griewangk, [-600, 600]] 
     ]
     
     # Plotting Info
