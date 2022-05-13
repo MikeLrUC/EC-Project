@@ -1,0 +1,44 @@
+Descriptive Statistics
+
+[Default Algorithm] Generation:
+	- Minimum: 32,
+	- Maximum: 277,
+	- Mean: 162.13333333333333,
+	- Standard Deviation: 75.43462217193257,
+	- Variance: 5690.382222222222,
+	- Median: 145.0,
+	- Mode: ModeResult(mode=array([72]), count=array([2])),
+	- Skew: -0.016797183780022276,
+	- Kurtosis: -1.4379494437217695,
+	- Q1 - Q2 - Q3: array([101.5 , 145.  , 237.25])
+
+[SA Algorithm] Generation:
+	- Minimum: 57,
+	- Maximum: 294,
+	- Mean: 199.93333333333334,
+	- Standard Deviation: 71.70584975362114,
+	- Variance: 5141.728888888889,
+	- Median: 210.0,
+	- Mode: ModeResult(mode=array([111]), count=array([2])),
+	- Skew: -0.34797366625476933,
+	- Kurtosis: -1.152891351636208,
+	- Q1 - Q2 - Q3: array([143.75, 210.  , 260.25])
+
+Inferencial Statistics
+
+Parametric Assumptions:
+	- Kolmogorov-Smirnov P-Values:
+		- [Default Algorithm] Generation: 2.4914985551390122e-06
+		- [SA Algorithm] Generation: 6.805991202777347e-06
+	- Levene P-Value: 0.49475405976468423
+
+Hypothesis Test Parameters:
+	- Parametric: False
+	- Paired: True
+	- Matched: True
+
+Test Result:
+	- WilcoxonResult(statistic=141.0, pvalue=0.059822088723145206)
+	- Explained: Not Reject H0 
+	- Effect Size: -0.24296554913097476
+	- Explained: Small effect size
