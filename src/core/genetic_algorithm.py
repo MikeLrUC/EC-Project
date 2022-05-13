@@ -53,10 +53,10 @@ if __name__ == "__main__":
 
     # Default Parameters
     N_RUNS = 30
-    N_GENERATIONS = 1000
-    N_POPULATION = 10                            
+    N_GENERATIONS = 300
+    N_POPULATION = 100                          
     SIZE_CHROMOSOME = 20
-    LEARNING_RATE = 0.1
+    LEARNING_RATE = 0.9
     STD_DOMAIN = [0, 1]
     SEEDS = [rd.randint(0, 10000) for _ in range(N_RUNS)]
     
@@ -68,8 +68,8 @@ if __name__ == "__main__":
         [Fitness.step, [-5.12, 5.12]],
         [Fitness.quartic, [-1.28, 1.28]], 
         [Fitness.rastrigin, [-5.12, 5.12]],
-        [Fitness.schwefel, [-500, 500]], 
-        [Fitness.griewangk, [-600, 600]] 
+        #[Fitness.schwefel, [-500, 500]], 
+        #[Fitness.griewangk, [-600, 600]] 
     ]
 
     labels = ["Default Algorithm", "SA Algorithm"]
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         default = {
             "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual, STD_DOMAIN), 
             "crossover"  : Crossover.n_point_crossover(2, 0.8),
-            "mutation"   : Mutation.default(0.5),           # Mutation for the Default GA
+            "mutation"   : Mutation.default(0.1),           # Mutation for the Default GA
             "selection"  : Selection.tournament(3),
             "survival"   : Survival.elitism(1),
             "fitness"    : benchmark,
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         sa = {
             "initializer": Generator.random_float_generation(SIZE_CHROMOSOME, N_POPULATION, [domain] * SIZE_CHROMOSOME, Individual_SA, STD_DOMAIN), 
             "crossover"  : Crossover.n_point_crossover(2, 0.8),
-            "mutation"   : Mutation.SA(0.5, LEARNING_RATE),  # Mutation for the SA GA
+            "mutation"   : Mutation.SA(0.1, LEARNING_RATE),  # Mutation for the SA GA
             "selection"  : Selection.tournament(3),
             "survival"   : Survival.elitism(1),
             "fitness"    : benchmark,

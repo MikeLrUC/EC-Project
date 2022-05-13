@@ -17,10 +17,10 @@ if __name__ == "__main__":
     # Parameters to Test
     parameters = {
         #"Mutation Probability": [0.1, 0.3],
-        "Population": [100, 150],
+        #"Population": [100, 150],
         #"Learning Rate": [0.1, 0.5, 0.9],
         #"Std Domain": [[0,1], [1,1]],
-        #"Crossover Probability": [0.7, 0.8]
+        "Crossover Probability": [0.7, 0.8]
     }
 
     # Parameters Fixed, while testing some
