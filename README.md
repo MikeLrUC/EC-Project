@@ -1,4 +1,4 @@
-# EC-Project
+# EC Project
 A project for the Evolutionary Computation subject: Self-Adapatation in Evolutionary Strategies
 
 ## Team
